@@ -4,7 +4,7 @@ from sqlalchemy.orm import validates
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 
-from config import db, bcrypt, MetaData
+from config import db
 
 class Set(db.Model, SerializerMixin):
     __tablename__ = 'sets'
@@ -14,8 +14,9 @@ class Set(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime)
     flashcards = db.relationship('Flashcard', back_populates='set', cascade="all, delete-orphan")
 
-    def __init__(self) -> None:
+    def __init__(self, name) -> None:
         self.created_at = datetime.utcnow()
+        self.name = name
 
 class Flashcard(db.Model, SerializerMixin):
     __tablename__ = 'flashcards'
