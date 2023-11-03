@@ -1,7 +1,7 @@
 import { useRef } from 'react'
-import FlashCard from './FlashCard.jsx'
+// import FlashCard from './FlashCard'
 
-export const CourseCarousel = () => {
+export default function CourseCarousel() {
     const scrollContainer = useRef(null)
 
     const handleBackClick = () => {
@@ -29,7 +29,7 @@ export const CourseCarousel = () => {
                 ref={scrollContainer}
                 >
                     <div className='flex items-center justify-center m-auto'>
-                        <FlashCard />
+                        {/* <FlashCard /> */}
                     </div>
                 </div>
                 {/* <StyledIcon as={ArrowRightIcon} onClick={handleNextClick} /> */}

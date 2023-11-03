@@ -1,5 +1,5 @@
 
-export const Card = () => {
+export default function FlashCard() {
     return (
         <>
             <div className="w-[600px] h-[325px] border-2 text-center rounded-lg">

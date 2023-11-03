@@ -1,6 +1,6 @@
-import Term from "./Term"
+import Term from "./Term.jsx"
 
-export const TermContainer = () => {
+export default function TermContainer() {
 
     return (
         <div className="p-[15px] justify-center items-center flex">
