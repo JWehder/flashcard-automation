@@ -1,7 +1,8 @@
 import { useState } from "react"
 import Input from "./Input.jsx"
 
-export default function Term() {
+// eslint-disable-next-line react/prop-types
+export default function Term({ term, definition, readOnly=true }) {
     const [termValue, setTermValue] = useState("")
     const [defValue, setDefValue] = useState("")
 
@@ -19,14 +20,16 @@ export default function Term() {
             <form>
                 <Input 
                 placeholder={"term"}
-                value={termValue} 
+                value={term ? term : termValue} 
                 onChange={(e) => setTermValue(e.target.value)} 
+                readOnly={readOnly}
                 />
                 <br />
                 <Input 
                 placeholder={"definition"}
-                value={defValue} 
+                value={definition ? definition : defValue} 
                 onChange = {(e) => setDefValue(e.target.value)} 
+                readOnly={readOnly}
                 />
             </form>
         </div>

@@ -1,11 +1,22 @@
+import { useEffect } from "react"
 import Term from "./Term.jsx"
 
 export default function TermContainer() {
+
+    // const fetchedTerms = useEffect(() => {
+    //     // grab terms from backend
+    // }, [])
+
+    // const [terms, setCurrentTerms] = useState([])
 
     return (
         <>
         <div className="p-[15px] justify-center items-center flex">
             <Term />
+            {/* {fetchedTerms.map((term) => <Term key={`term-${term.id}`} term={term.answer} definition={term.question} />)} */}
+            {/* {
+                terms.map((term) => )
+            } */}
 
         </div>
         <div className="justify-center items-center flex">
