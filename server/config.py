@@ -6,7 +6,7 @@ from sqlalchemy import MetaData
 from flask_cors import CORS
 
 app = Flask(__name__)
-# CORS(app, origins=["http://localhost:3000"])
+CORS(app, origins=["http://localhost:3000"])
 app.secret_key = b'Y\xf1Xz\x00\xad|eQ\x80t \xca\x1a\x10K'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -19,3 +19,5 @@ db = SQLAlchemy(metadata=metadata)
 
 migrate = Migrate(app, db)
 db.init_app(app)
+
+api = Api(app)

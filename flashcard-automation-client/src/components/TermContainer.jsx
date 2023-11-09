@@ -1,26 +1,54 @@
-import { useEffect } from "react"
 import Term from "./Term.jsx"
+import { useQuery } from "@tanstack/react-query"
+import { endpoint } from "../Context.jsx";
+
+const fetchSets = async ({ signal }) => {
+    const response = await fetch(`${endpoint}/sets`, { signal })
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json()
+};
+
+const fetchSet = async ({ signal }) => {
+    const response = await fetch(`${endpoint}/default_set`, { signal })
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json()
+};
 
 export default function TermContainer() {
+    // const query = useQuery();
+    // const queryClient = useQueryClient();
 
-    // const fetchedTerms = useEffect(() => {
-    //     // grab terms from backend
-    // }, [])
+    const { sets , isLoading: isSetsLoading } = useQuery({ queryKey: ['sets'], queryFn: fetchSets });
 
-    const { isLoading, data, error } = useQuery({
-        queryKey: ['sets', ]
+    const { set, isLoading: isSetLoading } = useQuery({
+        queryKey: ['set'],
+        enabled: !!sets,
+        queryFn: fetchSet
     })
+
+    
+    if (isSetsLoading) {
+        return <div>Loading sets...</div>;
+    }
+
+    if (isSetLoading) {
+        return <div>Loading set...</div>
+    }
 
     // const [terms, setCurrentTerms] = useState([])
 
     return (
         <>
+        <select>
+            {sets?.map((set) =>  <option value={set.name} key={`${set.name}-${set.id}`}  />)}
+        </select>
         <div className="p-[12px] justify-center items-center flex m-0">
             <Term />
-            {/* {fetchedTerms.map((term) => <Term key={`term-${term.id}`} id={term.id} term={term.answer} definition={term.question} />)} */}
-            {/* {
-                terms.map((term) => )
-            } */}
+            {set.terms.map((term) => <Term key={`term-${term.id}`} id={term.id} term={term.answer} definition={term.question} />)} 
 
         </div>
         <div className="justify-center items-center flex">

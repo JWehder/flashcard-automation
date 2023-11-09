@@ -36,11 +36,23 @@ def get_set_by_id(set_id):
     
     return _set.to_dict(), HTTP_SUCCESS
 
+@app.route('/default_set')
+def get_default_set():
+    default_set = Set.query.first()
+    if default_set is None:
+        return {'error': 'no sets have been created yet'}, HTTP_NOT_FOUND
+
+    return default_set.to_dict(), HTTP_SUCCESS
+
 @app.route('/sets')
 def get_all_sets():
     sets = Set.query.all()
+    sets_list = list()
 
-    return sets.to_dict(), HTTP_SUCCESS
+    for _set in sets:
+        sets_list.append(_set.name)
+
+    return jsonify(sets_list), HTTP_SUCCESS
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

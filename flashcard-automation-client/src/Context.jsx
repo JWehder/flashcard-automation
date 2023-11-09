@@ -1,13 +1,15 @@
-import { createContext, useState } from "react";
+import { createContext } from "react";
 
 const Context = createContext();
+
+export const endpoint = "http://127.0.0.1:5555"
 
 // eslint-disable-next-line react/prop-types
 function ContextProvider({ children }) {
 
-    const [readOnly, setReadOnly] = useState(true)
+    
 
-    return <Context.Provider value={{ readOnly, setReadOnly }} >{children}</Context.Provider>
+    return <Context.Provider value={{ }} >{children}</Context.Provider>
 }
 
 export { ContextProvider, Context }
