@@ -7,6 +7,10 @@ export default function TermContainer() {
     //     // grab terms from backend
     // }, [])
 
+    const { isLoading, data, error } = useQuery({
+        queryKey: ['sets', ]
+    })
+
     // const [terms, setCurrentTerms] = useState([])
 
     return (
