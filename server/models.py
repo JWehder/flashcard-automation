@@ -6,7 +6,39 @@ from datetime import datetime
 
 from config import db
 
-class Set(db.Model, SerializerMixin):
+class Base(db.Model, SerializerMixin):
+    __abstract__ = True
+    # include_timestamps = False
+
+    def to_dict(self, visited=None, exclude=None):
+        if visited is None:
+            visited = set()
+        if exclude is None:
+            exclude = set()
+
+        if self in visited:
+            return {}
+
+        visited.add(self)
+
+        serialized = {}
+        for column in self.__table__.columns:
+            serialized[column.name] = getattr(self, column.name)
+
+        for relationship in self.__mapper__.relationships:
+            if relationship.key not in exclude:
+                related_obj = getattr(self, relationship.key)
+                if related_obj is None:
+                    serialized[relationship.key] = None
+                elif isinstance(related_obj, list):
+                    serialized[relationship.key] = [obj.to_dict(visited) for obj in related_obj]
+                else:
+                    serialized[relationship.key] = related_obj.to_dict(visited)
+
+        visited.remove(self)
+        return serialized
+
+class Set(Base):
     __tablename__ = 'sets'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -18,7 +50,7 @@ class Set(db.Model, SerializerMixin):
         self.created_at = datetime.utcnow()
         self.name = name
 
-class Flashcard(db.Model, SerializerMixin):
+class Flashcard(Base):
     __tablename__ = 'flashcards'
 
     id = db.Column(db.Integer, primary_key=True)
