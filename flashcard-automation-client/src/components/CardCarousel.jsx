@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 // import FlashCard from './FlashCard'
 
-export default function CourseCarousel() {
+export default function CardCarousel() {
     const scrollContainer = useRef(null)
 
     const handleBackClick = () => {
