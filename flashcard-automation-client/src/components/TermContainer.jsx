@@ -1,21 +1,17 @@
 import Term from "./Term.jsx"
 import { useQuery } from "@tanstack/react-query"
 import { endpoint } from "../Context.jsx";
+import axios from "axios";
 
-const fetchSets = async ({ signal }) => {
-    const response = await fetch(`${endpoint}/sets`, { signal })
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json()
+const fetchSets = async () => {
+    const response = await axios.get(`${endpoint}/sets`)
+    console.log(response.data[0])
+    return response.data[0]
 };
 
-const fetchSet = async ({ signal }) => {
-    const response = await fetch(`${endpoint}/default_set`, { signal })
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json()
+const fetchSet = async () => {
+    const response = await axios.get(`${endpoint}/default_set`)
+    return response.data
 };
 
 export default function TermContainer() {
@@ -25,7 +21,7 @@ export default function TermContainer() {
     const { sets , isLoading: isSetsLoading } = useQuery({ queryKey: ['sets'], queryFn: fetchSets });
 
     const { set, isLoading: isSetLoading } = useQuery({
-        queryKey: ['set'],
+        queryKey: 'set',
         enabled: !!sets,
         queryFn: fetchSet
     })
@@ -39,16 +35,14 @@ export default function TermContainer() {
         return <div>Loading set...</div>
     }
 
-    // const [terms, setCurrentTerms] = useState([])
-
     return (
         <>
         <select>
-            {sets?.map((set) =>  <option value={set.name} key={`${set.name}-${set.id}`}  />)}
+            {sets?.map((set) =>  <option value={set} key={set} />)}
         </select>
         <div className="p-[12px] justify-center items-center flex m-0">
             <Term />
-            {set.terms.map((term) => <Term key={`term-${term.id}`} id={term.id} term={term.answer} definition={term.question} />)} 
+            {set.flashcards.map((flashcard) => <Term key={`flashcard-${flashcard.id}`} id={flashcard.id} term={flashcard.answer} definition={flashcard.question} />)} 
 
         </div>
         <div className="justify-center items-center flex">
