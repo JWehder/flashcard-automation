@@ -33,7 +33,6 @@ export default function TermContainer() {
             </button>
         }
         <>
-            {console.log(set)}
             {flashcards} 
             {terms}
         </>
