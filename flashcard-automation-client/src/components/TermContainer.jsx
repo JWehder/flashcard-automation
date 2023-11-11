@@ -1,36 +1,15 @@
-import Term from "./Term.jsx"
-import { useQuery } from "@tanstack/react-query"
-import { endpoint } from "../Context.jsx";
-import axios from "axios";
-import CardCarousel from "./CardCarousel.jsx";
+import Term from "./Term.jsx";
+import { useContext } from "react";
+import { Context } from "../Context.jsx";
+import { useState } from "react";
 
-const fetchSets = async () => {
-    const response = await axios.get(`${endpoint}/sets`)
-    console.log(response.data[0])
-    return response.data
-};
 
-const fetchSet = async () => {
-    const response = await axios.get(`${endpoint}/default_set`)
-    return response.data
-};
 
 export default function TermContainer() {
     // const query = useQuery();
     // const queryClient = useQueryClient();
-
-    // first query for grabbing all the names of sets the user has
-    const { data: sets , isLoading: isSetsLoading } = useQuery({ queryKey: ['sets'], queryFn: fetchSets });
-
-    // used for the next dependent query that will execute when the sets query
-    // is complete
-    const hasSets = sets && sets.length > 0;
-
-    const { data: set, isLoading: isSetLoading } = useQuery({
-        queryKey: ['set'],
-        enabled: !!hasSets,
-        queryFn: fetchSet
-    })
+    const { isSetsLoading, isSetLoading, hasSets, set, sets } = useContext(Context)
+    const [terms, setTerms] = useState([<Term key={'term - 1'} />])
 
     if (isSetsLoading) {
         return <div>Loading sets...</div>;
@@ -40,6 +19,8 @@ export default function TermContainer() {
         return <div>Loading set...</div>
     }
 
+    const flashcards = set.flashcards.map((flashcard) => <Term key={`flashcard-${flashcard.id}`} id={flashcard.id} term={flashcard.answer} definition={flashcard.question} />)
+
     return (
         <>
         { hasSets ?
@@ -47,19 +28,17 @@ export default function TermContainer() {
                 {sets.map((set) =>  <option value={set} key={set}>{set}</option>)}
             </select>
          :
-            <button className="full-rounded">
+            <button className="full-rounded bg-green-500/50 hover:bg-green-500">
                 create new set +
             </button>
         }
-        <div className="p-[12px] justify-center items-center flex m-0">
-
-        </div>
-        <CardCarousel>
-            {set.flashcards?.map((flashcard) => <Term key={`flashcard-${flashcard.id}`} id={flashcard.id} term={flashcard.answer} definition={flashcard.question} />)} 
-                <Term />
-        </CardCarousel>
+        <>
+            {console.log(set)}
+            {flashcards} 
+            {terms}
+        </>
         <div className="justify-center items-center flex">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 stroke-green-500/50 hover:stroke-green-500 cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 stroke-green-500/50 hover:stroke-green-500 cursor-pointer" onClick={() => setTerms([...terms, <Term key={`term - ${terms.length + 1}`} />])}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
         </div>
