@@ -3,13 +3,11 @@ import { useContext } from "react";
 import { Context } from "../Context.jsx";
 import { useState } from "react";
 
-
-
 export default function TermContainer() {
     // const query = useQuery();
     // const queryClient = useQueryClient();
     const { currentSet, isSetsLoading, hasSets, sets, changeSet } = useContext(Context)
-    const [terms, setTerms] = useState([<Term key={'term - 1'} />])
+    const [terms, setTerms] = useState([{definition: "", term: ""}])
 
     if (isSetsLoading) {
         return <div>Loading sets...</div>;
@@ -23,6 +21,8 @@ export default function TermContainer() {
             return [];
         }
     }
+
+    const displayCurrentTerms = terms.map((term) => <Term key={`flashcard-${flashcard.id}`} definition={term.definition} term={term.term}  />)
 
     return (
         <>

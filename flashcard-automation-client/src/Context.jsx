@@ -13,23 +13,22 @@ function ContextProvider({ children }) {
 
     const fetchSets = async () => {
         const response = await axios.get(`${endpoint}/sets`)
-        if (response.data.length > 0) {
-            setCurrentSetPointer(response.data[0].id)
-        }
+        setCurrentSetPointer(response.data[0].id)
         return response.data
     };
 
-    const changeSet = (name) => {
-        const selectedSet = sets.find((set) => set.name === name)
-        setCurrentSetPointer(selectedSet.id)
-    }
-
-    // need a pointer to find the currentSet rather than transferring the data there
-    // don't want the currentSet's data in two separate places in case it changes
-    const currentSet = sets.find((set) => set.id === currentSetPointer)
-
     // first query for grabbing all the names of sets the user has
     const { data: sets , isLoading: isSetsLoading } = useQuery({ queryKey: ['sets'], queryFn: fetchSets });
+    
+
+    const changeSet = (name) => {
+        const selectedSet = sets.find((set) => set.name === name)
+        if (selectedSet) {
+            setCurrentSetPointer(selectedSet.id)
+        }
+    }
+
+    let currentSet = sets ? sets.find(set => set.id === currentSetPointer) : null;
 
     // used for the next dependent query that will execute when the sets query
     // is complete

@@ -4,39 +4,39 @@ import { useContext } from "react"
 import { Context } from "../Context.jsx"
 import axios from "axios"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useEffect } from "react"
 
 // eslint-disable-next-line react/prop-types
 export default function Term({ term, definition, id }) {
     const { endpoint, currentSet } = useContext(Context)
 
-    const [termValue, setTermValue] = useState("")
-    const [defValue, setDefValue] = useState("")
+    const queryClient =  useQueryClient();
 
-    const queryClient = useQueryClient();
+    const updateMutation = useMutation({
+        mutationFn: id => axios.patch(`${endpoint}/flashcards/${id}`, )
+    })
 
-    const deleteMutation = useMutation(
-        id => axios.delete(`${endpoint}/flashcards/${id}`),
-        {
-          onSuccess: () => {
-            // Assuming 'variables' is the id of the deleted term
-            queryClient.setQueryData(['sets'], oldSets => {
-              return oldSets.map(set => {
-                if (set.id === currentSet.id) { 
-                  return {
-                    ...set,
-                    flashcards: set.flashcards.filter(fcard => fcard.id !== id)
-                  };
-                }
-                return set;
-              });
+    const deleteMutation = useMutation({
+        mutationFn: id => axios.delete(`${endpoint}/flashcards/${id}`),
+        onSuccess: () => {
+        // Assuming 'variables' is the id of the deleted term
+        queryClient.setQueryData(['sets'], oldSets => {
+            return oldSets.map(set => {
+            if (set.id === currentSet.id) { 
+                return {
+                ...set,
+                flashcards: set.flashcards.filter(fcard => fcard.id !== id)
+                };
+            }
+            return set;
             });
-          },
-          // Optionally, handle errors
-          onError: (error) => {
-            console.error("Error deleting term:", error);
-          }
+        });
+        },
+        // Optionally, handle errors
+        onError: (error) => {
+        console.error("Error deleting term:", error);
         }
-    );
+});
 
     const [readOnly, setReadOnly] = useState(true)
 
@@ -56,7 +56,6 @@ export default function Term({ term, definition, id }) {
                         placeholder={"definition"}
                         type="text"
                         input={definition}
-                        value={defValue} 
                         onChange = {(e) => setDefValue(e.target.value)} 
                         readOnly={readOnly}
                         />
@@ -68,12 +67,13 @@ export default function Term({ term, definition, id }) {
                         onChange={(e) => setTermValue(e.target.value)} 
                         readOnly={readOnly}
                         />
+                        { readOnly ?  "" : <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" name="checkmark" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 stroke-green-500/50 hover:stroke-green-500 cursor-pointer my-2" onClick={() => setReadOnly(true)}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        }
                     </form>
                     <div className="align-right flex justify-end">
-                    { readOnly ?  "" : <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" name="checkmark" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 stroke-green-500/50 hover:stroke-green-500 cursor-pointer my-2" onClick={() => setReadOnly(true)}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    }
+
                     </div>
                 </div>
             </div>
