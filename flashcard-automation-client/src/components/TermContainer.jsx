@@ -8,24 +8,27 @@ import { useState } from "react";
 export default function TermContainer() {
     // const query = useQuery();
     // const queryClient = useQueryClient();
-    const { isSetsLoading, isSetLoading, hasSets, set, sets } = useContext(Context)
+    const { currentSet, isSetsLoading, hasSets, sets, changeSet } = useContext(Context)
     const [terms, setTerms] = useState([<Term key={'term - 1'} />])
 
     if (isSetsLoading) {
         return <div>Loading sets...</div>;
     }
 
-    if (isSetLoading) {
-        return <div>Loading set...</div>
-    }
+    const displayTerms = () => {
 
-    const flashcards = set.flashcards.map((flashcard) => <Term key={`flashcard-${flashcard.id}`} id={flashcard.id} term={flashcard.answer} definition={flashcard.question} />)
+        if (currentSet.flashcards.length > 0) {
+            return currentSet.flashcards.map((flashcard) => <Term key={`flashcard-${flashcard.id}`} id={flashcard.id} term={flashcard.answer} definition={flashcard.question} />);
+        } else {
+            return [];
+        }
+    }
 
     return (
         <>
         { hasSets ?
             <select>
-                {sets.map((set) =>  <option value={set} key={set}>{set}</option>)}
+                {sets.map((set) =>  <option onSelect={(e) => changeSet(e.target.value)} value={currentSet.name} key={set}>{currentSet.name}</option>)}
             </select>
          :
             <button className="full-rounded bg-green-500/50 hover:bg-green-500">
@@ -33,11 +36,11 @@ export default function TermContainer() {
             </button>
         }
         <>
-            {flashcards} 
+            {displayTerms()} 
             {terms}
         </>
         <div className="justify-center items-center flex">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 stroke-green-500/50 hover:stroke-green-500 cursor-pointer" onClick={() => setTerms([...terms, <Term key={`term - ${terms.length + 1}`} />])}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" name="add" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 stroke-green-500/50 hover:stroke-green-500 cursor-pointer" onClick={() => setTerms([...terms, <Term key={`term - ${terms.length + 1}`} />])}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
         </div>
