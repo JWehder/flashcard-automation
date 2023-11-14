@@ -2,6 +2,7 @@ import Term from "./Term.jsx";
 import { useContext } from "react";
 import { Context } from "../Context.jsx";
 import { useState } from "react";
+import { v4 as uuidv4 } from 'uuid';
 
 export default function TermContainer() {
     // const query = useQuery();
@@ -22,7 +23,7 @@ export default function TermContainer() {
         }
     }
 
-    const displayCurrentTerms = terms.map((term) => <Term key={`flashcard-${flashcard.id}`} definition={term.definition} term={term.term}  />)
+    const displayCurrentTerms = terms.map((term) => <Term key={`flashcard-${uuidv4()}`} definition={term.definition} term={term.term}  />)
 
     return (
         <>
@@ -37,7 +38,7 @@ export default function TermContainer() {
         }
         <>
             {displayTerms()} 
-            {terms}
+            {displayCurrentTerms}
         </>
         <div className="justify-center items-center flex">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" name="add" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 stroke-green-500/50 hover:stroke-green-500 cursor-pointer" onClick={() => setTerms([...terms, <Term key={`term - ${terms.length + 1}`} />])}>

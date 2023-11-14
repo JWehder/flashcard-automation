@@ -5,15 +5,61 @@ import { Context } from "../Context.jsx"
 import axios from "axios"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useEffect } from "react"
+import { endpoint } from "../Context.jsx"
 
 // eslint-disable-next-line react/prop-types
 export default function Term({ term, definition, id }) {
-    const { endpoint, currentSet } = useContext(Context)
+    const { currentSet } = useContext(Context)
+
+    const [defValue, setDef] = useState("")
+    const [termValue, setTerm] = useState("")
+
+    useEffect(() => {
+        if (definition) {
+            setDef(definition)
+        }
+
+        if (term) {
+            setTerm(term)
+        }
+    }, [term, definition])
 
     const queryClient =  useQueryClient();
 
+    const handleSubmit = () => {
+        setReadOnly(true)
+        updateMutation.mutate()
+    }
+
+    // axios.patch(, JSON.stringify(data)
+    const serverRoute = `${endpoint}/flashcards/${id}`
+
     const updateMutation = useMutation({
-        mutationFn: id => axios.patch(`${endpoint}/flashcards/${id}`, )
+        mutationFn: () => axios.patch(serverRoute, 
+            JSON.stringify({term: termValue, definition: defValue}), 
+            {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }),
+        onSuccess: (resp) => {
+            queryClient.setQueryData(['sets'], oldSets => {
+                return oldSets.map(set => {
+                const data = resp.data
+                if (set.id === currentSet.id) {
+                    const filteredFlashcards = set.flashcards.filter((card) => card.id !== data.id);
+                    return {
+                        ...set, 
+                        flashcards: [...filteredFlashcards, data]
+                    }
+                }
+                return set
+                })
+            })
+        },
+        onError: (error) => {
+            console.log(error)
+        }
     })
 
     const deleteMutation = useMutation({
@@ -22,12 +68,12 @@ export default function Term({ term, definition, id }) {
         // Assuming 'variables' is the id of the deleted term
         queryClient.setQueryData(['sets'], oldSets => {
             return oldSets.map(set => {
-            if (set.id === currentSet.id) { 
-                return {
-                ...set,
-                flashcards: set.flashcards.filter(fcard => fcard.id !== id)
-                };
-            }
+                if (set.id === currentSet.id) { 
+                    return {
+                        ...set,
+                        flashcards: set.flashcards.filter(fcard => fcard.id !== id)
+                    };
+                }
             return set;
             });
         });
@@ -41,7 +87,7 @@ export default function Term({ term, definition, id }) {
     const [readOnly, setReadOnly] = useState(true)
 
     return (
-            <div className="p-[12px] justify-center items-center m-0 flex">
+            <div className="p-[8px] justify-center items-center m-0 flex">
                 <div className="border-2 p-[15px] w-[600px] my-[5px] rounded-lg">
                     <div className="align-right flex justify-end">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" name="edit" className="w-6 h-6 mx-2 stroke-blue-500/50 cursor-pointer hover:stroke-blue-500" onClick={() => setReadOnly(false)}>
@@ -55,26 +101,24 @@ export default function Term({ term, definition, id }) {
                         <Input 
                         placeholder={"definition"}
                         type="text"
-                        input={definition}
-                        onChange = {(e) => setDefValue(e.target.value)} 
+                        input={defValue}
+                        onChange = {(e) => setDef(e.target.value)} 
                         readOnly={readOnly}
                         />
                         <Input 
                         placeholder={"term"}
                         type="text"
-                        input={term}
-                        value={term ? term : termValue} 
-                        onChange={(e) => setTermValue(e.target.value)} 
+                        input={termValue}
+                        onChange={(e) => setTerm(e.target.value)} 
                         readOnly={readOnly}
                         />
-                        { readOnly ?  "" : <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" name="checkmark" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 stroke-green-500/50 hover:stroke-green-500 cursor-pointer my-2" onClick={() => setReadOnly(true)}>
+                        <div className="align-right flex justify-end">
+                        { readOnly ?  "" : <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" name="checkmark" strokeWidth={1.5} stroke="currentColor" onClick={handleSubmit} className="w-6 h-6 stroke-green-500/50 hover:stroke-green-500 cursor-pointer my-0">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         }
+                        </div>
                     </form>
-                    <div className="align-right flex justify-end">
-
-                    </div>
                 </div>
             </div>
     )
