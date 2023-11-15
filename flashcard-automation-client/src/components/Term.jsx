@@ -51,6 +51,7 @@ export default function Term({ term, definition, id }) {
                     return {
                         ...set, 
                         flashcards: [...filteredFlashcards, data]
+                        .sort((a,b) => a.id - b.id)
                     }
                 }
                 return set
@@ -64,14 +65,15 @@ export default function Term({ term, definition, id }) {
 
     const deleteMutation = useMutation({
         mutationFn: id => axios.delete(`${endpoint}/flashcards/${id}`),
-        onSuccess: () => {
+        onSuccess: (data, variables) => {
         // Assuming 'variables' is the id of the deleted term
+        console.log(data, variables)
         queryClient.setQueryData(['sets'], oldSets => {
             return oldSets.map(set => {
                 if (set.id === currentSet.id) { 
                     return {
                         ...set,
-                        flashcards: set.flashcards.filter(fcard => fcard.id !== id)
+                        flashcards: set.flashcards.filter(fcard => fcard.id !== id).sort((a, b) => a.id - b.id)
                     };
                 }
             return set;
@@ -80,7 +82,7 @@ export default function Term({ term, definition, id }) {
         },
         // Optionally, handle errors
         onError: (error) => {
-        console.error("Error deleting term:", error);
+            console.error("Error deleting term:", error);
         }
 });
 

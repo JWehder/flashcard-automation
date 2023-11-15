@@ -14,7 +14,6 @@ function ContextProvider({ children }) {
     const fetchSets = async () => {
         const response = await axios.get(`${endpoint}/sets`)
         setCurrentSetPointer(response.data[0].id)
-        console.log(response.data)
         return response.data
     };
 
