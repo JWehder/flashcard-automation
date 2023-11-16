@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 import traceback
 from functools import wraps
 from config import app, db, api
-from models import Set
+from models import Set, Flashcard
 from config import Flask, SQLAlchemy, db
 
 #HTTP Constants 
@@ -27,32 +27,113 @@ def authorized(func):
         return func(*args, **kwargs)
     return wrapper
 
-@app.route('/sets/<int:set_id>')
-def get_set_by_id(set_id):
-    # retrieve the terms by the particular set that was selected
-    _set = Set.query.filter_by(id=set_id).first()
-    if _set is None:
-        return {'error': 'set not found'}, HTTP_NOT_FOUND
-    
-    return _set.to_dict(), HTTP_SUCCESS
+@app.route('/sets/<int:id>', methods=['GET', 'POST', 'DELETE'])
+def modify_sets(set_id):
+    if request.method == 'GET':
+        # retrieve the terms by the particular set that was selected
+        _set = Set.query.filter_by(id=set_id).first()
+        if _set is None:
+            return {'error': 'set not found'}, HTTP_NOT_FOUND
+        
+        return _set.to_dict(), HTTP_SUCCESS
+    elif request.method == 'POST':
+        pass
+    elif request.method == 'DELETE':
+        pass
 
-@app.route('/default_set')
-def get_default_set():
-    default_set = Set.query.first()
-    if default_set is None:
-        return {'error': 'no sets have been created yet'}, HTTP_NOT_FOUND
+@app.route('/flashcards', methods=['POST'])
+def create_flashcard():
+    if request.method == 'POST':
+        req_values = request.get_json()
+        term = req_values.get('definition')
+        definition = req_values.get('term')
+        set_id = req_values.get('set_id')
+        
+        if not term or not definition:
+            return jsonify({'error': 'no flashcards in request'}), HTTP_BAD_REQUEST
 
-    return default_set.to_dict(), HTTP_SUCCESS
+        try:
+            new_flashcard = Flashcard(
+                answer=term,
+                question=definition,
+                set_id=set_id
+            )
+            db.session.add(new_flashcard)
+            db.session.commit()
+
+            return jsonify(new_flashcard), HTTP_CREATED
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'error': f'An error occurred: {str(e)}'}), HTTP_SERVER_ERROR
+
+@app.route('/flashcards/<int:id>', methods=['DELETE', 'PATCH'])
+def modify_flashcards(id):
+
+    if request.method == 'PATCH':
+        req_values = request.get_json()
+
+        flashcard = Flashcard.query.filter_by(id=id).first()
+
+        if not flashcard:
+            return { 'error': 'Flashcard not found' }, HTTP_NOT_FOUND
+
+        flashcard.question = req_values.get('definition')
+        flashcard.answer = req_values.get('term')
+
+        # Commit the changes
+        try:
+            flashcard_data = {
+                'id': flashcard.id,
+                'question': flashcard.question,
+                'answer': flashcard.answer,
+                'set_id': flashcard.set_id
+            }
+
+            db.session.commit()
+            return jsonify(flashcard_data), HTTP_SUCCESS
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({ 'error': f'An error occurred: {str(e)}' }), HTTP_SERVER_ERROR
+
+
+    if request.method == 'DELETE':
+        flashcard = Flashcard.query.filter_by(id=id).first()
+
+        # Check if the flashcard exists
+        if flashcard is None:
+            return {'error': 'Flashcard not found'}, HTTP_NOT_FOUND
+
+        try:
+            # Delete the flashcard
+            db.session.delete(flashcard)
+            # Commit the changes to the database
+            db.session.commit()
+
+            return {'message': 'Flashcard deleted successfully'}, HTTP_NO_CONTENT
+
+        except Exception as e:
+            # Rollback in case of an exception
+            db.session.rollback()
+            # Return an error response
+            return {'error': f'An error occurred: {str(e)}'}, HTTP_SERVER_ERROR
 
 @app.route('/sets')
 def get_all_sets():
     sets = Set.query.all()
-    sets_list = list()
+    sets[0] = sets[0].to_dict()
 
-    for _set in sets:
-        sets_list.append(_set.name)
+    return jsonify(sets), HTTP_SUCCESS
 
-    return jsonify(sets_list), HTTP_SUCCESS
+@app.route('/sets/<int:id>', methods=['GET'])
+def get_set(id):
+    if request.method == 'GET':
+        _set = Set.query.filter_by(id=id).first()
+
+        if not _set:
+            return { 'error': 'set not found' }, HTTP_NOT_FOUND
+
+        return _set.to_dict(), HTTP_SUCCESS
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
