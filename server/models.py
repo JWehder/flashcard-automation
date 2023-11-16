@@ -54,11 +54,21 @@ class Flashcard(Base):
     __tablename__ = 'flashcards'
 
     id = db.Column(db.Integer, primary_key=True)
-    question = db.Column(db.String, nullable=False)
-    answer = db.Column(db.String, nullable=False)
+    term = db.Column(db.String, nullable=False)
+    definition = db.Column(db.String, nullable=False)
     set_id = db.Column('set_id', db.Integer, db.ForeignKey('sets.id'))
 
     set = db.relationship("Set", back_populates="flashcards")
 
     def __repr__(self):
         return f'Flashcard {self.question} - {self.answer}'
+
+    @validates('term')
+    def validate_term_length(self, key, term):
+        if len(term) <= 0:
+            raise AttributeError('Term must have more than zero characters')
+
+    @validates('definition')
+    def validate_def_length(self, key, definition):
+        if len(definition) <= 0:
+            raise AttributeError('Definition must have more than zero characters')

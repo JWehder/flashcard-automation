@@ -50,7 +50,7 @@ def create_flashcard():
         set_id = req_values.get('set_id')
         
         if not term or not definition:
-            return jsonify({'error': 'no flashcards in request'}), HTTP_BAD_REQUEST
+            return jsonify({'error': 'please include the definition and term in your request.'}), HTTP_BAD_REQUEST
 
         try:
             new_flashcard = Flashcard(
@@ -61,7 +61,7 @@ def create_flashcard():
             db.session.add(new_flashcard)
             db.session.commit()
 
-            return jsonify(new_flashcard), HTTP_CREATED
+            return new_flashcard.to_dict(), HTTP_CREATED
 
         except Exception as e:
             db.session.rollback()
