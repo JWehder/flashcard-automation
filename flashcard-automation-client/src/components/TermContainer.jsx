@@ -1,6 +1,7 @@
 import Term from "./Term.jsx";
 import { useContext } from "react";
 import { Context } from "../Context.jsx";
+import Title from "./Title.jsx";
 
 export default function TermContainer() {
     // const query = useQuery();
@@ -28,6 +29,7 @@ export default function TermContainer() {
 
     return (
         <div className="my-2">
+            <Title title={currentSet.name} />
         <>
             {shouldDisplayTerms ? 
             displayTerms() 

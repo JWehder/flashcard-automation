@@ -49,7 +49,7 @@ class Set(Base):
     __tablename__ = 'sets'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime)
     flashcards = db.relationship('Flashcard', back_populates='set', cascade="all, delete-orphan")
 

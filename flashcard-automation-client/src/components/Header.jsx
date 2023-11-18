@@ -12,7 +12,7 @@ export default function Header() {
     const queryClient = useQueryClient();
 
     const addSet = () => {
-        addMutation.mutate({name: setName})
+        addMutation.mutate({name: setName});
     }
 
     const addMutation = useMutation({
@@ -24,12 +24,12 @@ export default function Header() {
             });
         },
         onError: (error) => {
-            console.error("Error deleting term:", error);
+            console.error("Error inserting new term:", error);
         }
     });
 
     const handleSubmit = () => {
-        addMutation.mutate(setName)
+        addMutation.mutate(setName);
     }
 
     return (
@@ -69,6 +69,7 @@ export default function Header() {
                 :
                 ""
             }
+            {addMutation.isLoading ? <div>Loading your new set...</div> : ""}
         </div>
 
     )

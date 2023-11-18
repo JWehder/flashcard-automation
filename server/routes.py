@@ -144,7 +144,7 @@ def sets():
             db.session.add(new_set)
             db.session.commit(new_set)
 
-            return new_set.to_dict(), HTTP_CREATED
+            return jsonify(new_set.to_dict()), HTTP_CREATED
             
         except Exception as e:
             return jsonify({'error': f'An error occurred: {str(e)}'}), HTTP_UNPROCESSABLE_ENTITY
