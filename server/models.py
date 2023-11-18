@@ -38,6 +38,13 @@ class Base(db.Model, SerializerMixin):
         visited.remove(self)
         return serialized
 
+    def to_serializable(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'created_at': self.created_at
+        }
+
 class Set(Base):
     __tablename__ = 'sets'
 

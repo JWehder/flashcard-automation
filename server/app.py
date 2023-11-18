@@ -35,14 +35,15 @@ for _ in range(4):
     question = data.contents[0]
     response = palm.generate_text(prompt=f"Can you comprehensively answer this question about Python. Please answer it with less than 150 words. The question: {question}")
     flashcard = Flashcard(
-        question=str(question),
-        answer=str(response.result),
+        term=str(question),
+        definition=str(response.result),
         set_id=test_set.id
     )
     with app.app_context():
         db.session.add(flashcard)
-        db.session.commit()
     x+=1
+
+db.session.commit()
 
 with app.app_context():
     print(Flashcard.query.all())

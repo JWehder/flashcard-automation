@@ -54,8 +54,8 @@ def create_flashcard():
 
         try:
             new_flashcard = Flashcard(
-                answer=term,
-                question=definition,
+                term=term,
+                definition=definition,
                 set_id=set_id
             )
             db.session.add(new_flashcard)
@@ -78,15 +78,15 @@ def modify_flashcards(id):
         if not flashcard:
             return { 'error': 'Flashcard not found' }, HTTP_NOT_FOUND
 
-        flashcard.question = req_values.get('definition')
-        flashcard.answer = req_values.get('term')
+        flashcard.definition = req_values.get('definition')
+        flashcard.term = req_values.get('term')
 
         # Commit the changes
         try:
             flashcard_data = {
                 'id': flashcard.id,
-                'question': flashcard.question,
-                'answer': flashcard.answer,
+                'question': flashcard.term,
+                'answer': flashcard.definition,
                 'set_id': flashcard.set_id
             }
 
@@ -121,9 +121,16 @@ def modify_flashcards(id):
 @app.route('/sets')
 def get_all_sets():
     sets = Set.query.all()
-    sets[0] = sets[0].to_dict()
 
-    return jsonify(sets), HTTP_SUCCESS
+    if sets:
+        serialized_first_set = sets[0].to_dict()
+        serialized_sets = [_set.to_serializable() for _set in sets[1:]]
+
+        serialized_sets = [serialized_first_set] + serialized_sets
+    else:
+        serialized_sets = []
+        
+    return jsonify(serialized_sets), HTTP_SUCCESS
 
 @app.route('/sets/<int:id>', methods=['GET'])
 def get_set(id):
