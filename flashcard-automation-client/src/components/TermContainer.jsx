@@ -7,12 +7,14 @@ import { v4 as uuidv4 } from 'uuid';
 export default function TermContainer() {
     // const query = useQuery();
     // const queryClient = useQueryClient();
-    const { currentSet, isSetsLoading, hasSets, sets, changeSet } = useContext(Context)
+    const { currentSet, isSetsLoading } = useContext(Context)
     const [terms, setTerms] = useState([{definition: "", term: ""}])
 
     if (isSetsLoading) {
         return <div>Loading sets...</div>;
     }
+
+    const shouldDisplayTerms = !isSetsLoading && currentSet.flashcards.length < 1
 
     const displayTerms = () => {
 
@@ -23,21 +25,16 @@ export default function TermContainer() {
         }
     }
 
-    const displayCurrentTerms = terms.map((term) => <Term key={`flashcard-${uuidv4()}`} definition={term.definition} term={term.term}  />)
+    const displayCurrentTerms = terms.map((term) => <Term key={`flashcard-${uuidv4()}`} definition={term.definition} newPost term={term.term}  />)
 
     return (
+        <div className="my-2">
         <>
-        { hasSets ?
-            <select>
-                {sets.map((set) =>  <option onSelect={(e) => changeSet(e.target.value)} value={currentSet.name} key={set}>{currentSet.name}</option>)}
-            </select>
-         :
-            <button className="full-rounded bg-green-500/50 hover:bg-green-500">
-                create new set +
-            </button>
-        }
-        <>
-            {displayTerms()} 
+            {shouldDisplayTerms ? 
+            displayTerms() 
+            : 
+            <div>Sorry, there are no flashcards to display. Create one!</div>
+            } 
             {displayCurrentTerms}
         </>
         <div className="justify-center items-center flex">
@@ -45,6 +42,6 @@ export default function TermContainer() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
         </div>
-        </>
+        </div>
     )
 }
