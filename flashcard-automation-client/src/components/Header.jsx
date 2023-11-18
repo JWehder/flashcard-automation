@@ -1,12 +1,32 @@
 import { useContext } from "react"
 import { Context } from "../Context"
 import { useState } from "react";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import axios from "axios";
 
 export default function Header() {
     const { currentSet, sets, changeSet, hasSets } = useContext(Context);
     const [showForm, setShowForm] = useState("");
     const [setName, setSetName] = useState("");
+
+    const queryClient = useQueryClient();
+
+    const addMutation = useMutation({
+        mutationFn: (data) => axios.post('/sets', {name: data}),
+        onSuccess: (resp) => {
+            const set = resp.data
+            queryClient.setQueryData(['sets'], oldSets => {
+                return [...oldSets, set]
+            });
+        },
+        onError: (error) => {
+            console.error("Error deleting term:", error);
+        }
+    });
+
+    const handleSubmit = () => {
+        addMutation.mutate(setName)
+    }
 
     return (
         <div>
@@ -24,8 +44,8 @@ export default function Header() {
                 </button>
             </>
             { showForm ?
-                <div className="flex align-center items-center">
-                    <form>
+                <div className="flex justify-center mt-4">
+                    <form onSubmit={handleSubmit}>
                         <input
                         type="text"
                         value={setName}
@@ -35,7 +55,7 @@ export default function Header() {
                         >
                         </input>
                     </form>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 cursor-pointer stroke-red-500 hover:stroke-red-700" onClick={() => setShowForm(false)}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
