@@ -89,7 +89,7 @@ def modify_flashcards(id):
                 'answer': flashcard.definition,
                 'set_id': flashcard.set_id
             }
-
+            db.session.add(flashcard_data)
             db.session.commit()
             return jsonify(flashcard_data), HTTP_SUCCESS
         except Exception as e:
@@ -118,19 +118,36 @@ def modify_flashcards(id):
             # Return an error response
             return {'error': f'An error occurred: {str(e)}'}, HTTP_SERVER_ERROR
 
-@app.route('/sets')
-def get_all_sets():
-    sets = Set.query.all()
+@app.route('/sets', methods=['GET', 'POST'])
+def sets():
 
-    if sets:
-        serialized_first_set = sets[0].to_dict()
-        serialized_sets = [_set.to_serializable() for _set in sets[1:]]
+    if request.method == 'GET':
+        sets = Set.query.all()
 
-        serialized_sets = [serialized_first_set] + serialized_sets
-    else:
-        serialized_sets = []
-        
-    return jsonify(serialized_sets), HTTP_SUCCESS
+        if sets:
+            serialized_first_set = sets[0].to_dict()
+            serialized_sets = [_set.to_serializable() for _set in sets[1:]]
+
+            serialized_sets = [serialized_first_set] + serialized_sets
+        else:
+            serialized_sets = []
+            
+        return jsonify(serialized_sets), HTTP_SUCCESS
+
+    elif request.method == 'POST':
+        req_values = request.get_json()
+
+        try:
+            new_set = Set(
+                name = req_values.get('name')
+            )
+            db.session.add(new_set)
+            db.session.commit(new_set)
+
+            return new_set.to_dict(), HTTP_CREATED
+            
+        except Exception as e:
+            return jsonify({'error': f'An error occurred: {str(e)}'}), HTTP_UNPROCESSABLE_ENTITY
 
 @app.route('/sets/<int:id>', methods=['GET'])
 def get_set(id):

@@ -9,11 +9,10 @@ import { endpoint } from "../Context.jsx"
 
 // eslint-disable-next-line react/prop-types
 export default function Term({ newPost, term, definition, id }) {
-    const { currentSet } = useContext(Context)
+    const { currentSet, setCardError, cardError, postMutation } = useContext(Context)
 
     const [defValue, setDef] = useState("")
     const [termValue, setTerm] = useState("")
-    const [error, setError] = useState()
 
     useEffect(() => {
         if (definition) {
@@ -45,35 +44,6 @@ export default function Term({ newPost, term, definition, id }) {
     }
 
     const serverRoute = `${endpoint}/flashcards/${id}`
-
-    const postMutation = useMutation({
-        mutationFn: (data) => axios.post(`${endpoint}/flashcards`, 
-        JSON.stringify(data), {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }),
-        onSuccess: (resp) => {
-        queryClient.setQueryData(['sets'], oldSets => {
-            const data = resp.data
-            return oldSets.map(set => {
-                if (set.id === currentSet.id) { 
-                    return {
-                        ...set,
-                        flashcards: [...set.flashcards, data]
-                        .sort((a, b) => a.id - b.id)
-                    };
-                }
-            return set;
-            });
-        });
-        },
-        // Optionally, handle errors
-        onError: (error) => {
-            setError(error.response.data)
-            console.error("Error deleting term:", error);
-        }
-    });
 
     const updateMutation = useMutation({
         mutationFn: (data) => axios.patch(serverRoute, 
@@ -121,6 +91,7 @@ export default function Term({ newPost, term, definition, id }) {
         },
         // Optionally, handle errors
         onError: (error) => {
+            setCardError(error)
             console.error("Error deleting term:", error);
         }
     });
@@ -162,7 +133,7 @@ export default function Term({ newPost, term, definition, id }) {
                         </div>
                     </form>
                 </div>
-                <div className="text-red-500">{error}</div>
+                <div className="text-red-500">{cardError}</div>
             </div>
     )
 }
