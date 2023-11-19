@@ -6,7 +6,7 @@ import axios from "axios";
 import { endpoint } from "../Context";
 
 export default function Header() {
-    const { currentSet, sets, changeSet, hasSets, setShowTitle } = useContext(Context);
+    const { sets, changeSet, hasSets, setShowTitle } = useContext(Context);
     const [showForm, setShowForm] = useState("");
     const [setName, setSetName] = useState("");
 
@@ -49,7 +49,7 @@ export default function Header() {
                 <h1>Flashcard Automation</h1>
                 { hasSets ?
                 <select>
-                    {sets.map((set) =>  <option onSelect={(e) => changeSet(e.target.value)} value={currentSet.name} key={set}>{currentSet.name}</option>)}
+                    {sets.map((set) =>  <option onSelect={(e) => changeSet(e.target.value)} value={set.name} key={set.id}>{set.name}</option>)}
                 </select>
                 :
                 ""

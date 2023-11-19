@@ -4,20 +4,20 @@ import { Context } from '../Context'
 import { useEffect } from 'react'
 
 export default function CardCarousel() {
-    const { currentSet } = useContext(Context)
+    const { sets, currentSetPointer } = useContext(Context)
 
     const scrollContainer = useRef(null)
 
     const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState(0)
 
     useEffect(() => {
-        if (currentSet) {
+        if (currentSetPointer) {
             setCurrentFlashcardIndex(0)
         }
 
-    }, [currentSet])
+    }, [currentSetPointer])
 
-    if (!currentSet) {
+    if (!sets) {
         return <div>Loading flashcards...</div>
     }
 
@@ -31,7 +31,7 @@ export default function CardCarousel() {
     }
 
     const handleNextClick = () => {
-        if (currentSet.flashcards[currentFlashcardIndex + 1]) {
+        if (sets[currentSetPointer].flashcards[currentFlashcardIndex + 1]) {
             setCurrentFlashcardIndex(currentFlashcardIndex + 1)
         }
 
@@ -41,7 +41,7 @@ export default function CardCarousel() {
 
     return (
         <div>
-            { currentSet.flashcards.length > 0 ?
+            { sets[currentSetPointer].flashcards.length > 0 ?
             <>
             <div className='flex justify-center items-center mt-8'>
                 {/* handle the back click to the previous flashcard */}
@@ -57,8 +57,8 @@ export default function CardCarousel() {
                     >
                         <div className='flex items-center justify-center m-auto'>
                             <FlashCard 
-                            definition={currentSet.flashcards[currentFlashcardIndex].definition} 
-                            term={currentSet.flashcards[currentFlashcardIndex].term}
+                            definition={sets[currentSetPointer].flashcards[currentFlashcardIndex].definition} 
+                            term={sets[currentSetPointer].flashcards[currentFlashcardIndex].term}
                             />
                         </div>
                     </div>
@@ -70,7 +70,7 @@ export default function CardCarousel() {
                 </svg>
             </div>
             <div className='mb-8'>
-                {currentFlashcardIndex + 1} / {currentSet.flashcards.length}
+                {currentFlashcardIndex + 1} / {sets[currentSetPointer].flashcards.length}
             </div>
             </>
             :

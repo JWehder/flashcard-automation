@@ -7,7 +7,8 @@ export default function TermContainer() {
     // const query = useQuery();
     // const queryClient = useQueryClient();
     const { 
-        currentSet, 
+        sets,
+        currentSetPointer, 
         isSetsLoading, 
         displayCurrentTerms, 
         addTerm,
@@ -17,12 +18,12 @@ export default function TermContainer() {
         return <div>Loading sets...</div>;
     }
 
-    const shouldDisplayTerms = !isSetsLoading && currentSet.flashcards.length < 1
+    const shouldDisplayTerms = !isSetsLoading && sets[currentSetPointer].flashcards.length < 1
 
     const displayTerms = () => {
 
-        if (currentSet.flashcards.length > 0) {
-            return currentSet.flashcards.map((flashcard) => <Term key={`flashcard-${flashcard.id}`} id={flashcard.id} term={flashcard.answer} definition={flashcard.question} />);
+        if (sets[currentSetPointer].flashcards.length > 0) {
+            return sets[currentSetPointer].flashcards.map((flashcard) => <Term key={`flashcard-${flashcard.id}`} id={flashcard.id} term={flashcard.answer} definition={flashcard.question} />);
         } else {
             return [];
         }
@@ -30,7 +31,7 @@ export default function TermContainer() {
 
     return (
         <div className="my-2">
-            { showTitle ? <Title title={currentSet.name} /> : ""}
+            { showTitle ? <Title title={sets[currentSetPointer].name} /> : ""}
         <>
             {shouldDisplayTerms ? 
             displayTerms() 

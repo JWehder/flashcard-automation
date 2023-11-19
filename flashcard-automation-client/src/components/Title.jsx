@@ -6,12 +6,12 @@ import { endpoint } from "../Context";
 
 // eslint-disable-next-line react/prop-types
 export default function Title() {
-    const { currentSet, currentSetPointer } = useContext(Context);
+    const { sets, currentSetPointer, handleSaveClick } = useContext(Context);
 
     const path = `${endpoint}/sets/${currentSetPointer}`
 
     const [readOnly, setReadOnly] = useState(true);
-    const [currentName, setCurrentName] = useState(currentSet.name);
+    const [currentName, setCurrentName] = useState(sets[currentSetPointer].name);
 
     const queryClient = useQueryClient();
 
@@ -20,8 +20,8 @@ export default function Title() {
     }
 
     const handleBlur = () => {
-        if (currentName === currentSet.name) {
-            setCurrentName(currentSet.name)
+        if (currentName === sets[currentSetPointer].name) {
+            setCurrentName(sets[currentSetPointer].name)
         } else {
             updateMutation.mutate({name: currentName})
         }
@@ -40,7 +40,7 @@ export default function Title() {
         onSuccess: (resp) => {
             queryClient.setQueryData(['sets'], oldSets => {
                 const set = resp.data
-                const filteredSets = oldSets.filter((set) => set.id !== currentSet.id);
+                const filteredSets = oldSets.filter((set) => set.id !== sets[currentSetPointer].id);
                 return [...filteredSets, set]
             })
         },
@@ -64,7 +64,7 @@ export default function Title() {
                 />
             </div>
             <>
-                <button className="border-2 p-3 text-lg rounded-full bg-blue-500 text-white hover:bg-blue-700 my-3">
+                <button className="border-2 p-3 text-lg rounded-full bg-blue-500 text-white hover:bg-blue-700 my-3" onClick={handleSaveClick}>
                     Save Changes
                 </button>
             </>
