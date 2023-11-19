@@ -3,6 +3,7 @@ import { Context } from "../Context"
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import axios from "axios";
+import { endpoint } from "../Context";
 
 export default function Header() {
     const { currentSet, sets, changeSet, hasSets } = useContext(Context);
@@ -16,7 +17,7 @@ export default function Header() {
     }
 
     const addMutation = useMutation({
-        mutationFn: (data) => axios.post('/sets', data),
+        mutationFn: (data) => axios.post(`${endpoint}/sets`, data),
         onSuccess: (resp) => {
             const set = resp.data
             queryClient.setQueryData(['sets'], oldSets => {

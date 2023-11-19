@@ -149,7 +149,7 @@ def sets():
         except Exception as e:
             return jsonify({'error': f'An error occurred: {str(e)}'}), HTTP_UNPROCESSABLE_ENTITY
 
-@app.route('/sets/<int:id>', methods=['GET'])
+@app.route('/sets/<int:id>', methods=['GET', 'PATCH'])
 def get_set(id):
     if request.method == 'GET':
         _set = Set.query.filter_by(id=id).first()
@@ -158,6 +158,24 @@ def get_set(id):
             return { 'error': 'set not found' }, HTTP_NOT_FOUND
 
         return _set.to_dict(), HTTP_SUCCESS
+
+    elif request.method == 'PATCH':
+        req_values = request.get_json()
+
+        _set = Set.query.filter_by(id=id).first()
+
+        if not _set:
+            return jsonify({'error': 'set not found'}), HTTP_NOT_FOUND
+
+        _set.name = req_values.get('name')
+
+        try:
+            db.session.commit()
+
+            return jsonify(_set.to_dict()), HTTP_SUCCESS
+
+        except Exception as e:
+            return jsonify({'error': f'something went wrong editing this set: {str(e)}'}), HTTP_UNPROCESSABLE_ENTITY
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

@@ -2,10 +2,13 @@ import { useState, useContext } from "react"
 import { Context } from "../Context";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import { endpoint } from "../Context";
 
 // eslint-disable-next-line react/prop-types
 export default function Title() {
-    const { currentSet } = useContext(Context);
+    const { currentSet, currentSetPointer } = useContext(Context);
+
+    const path = `${endpoint}/sets/${currentSetPointer}`
 
     const [readOnly, setReadOnly] = useState(true);
     const [currentName, setCurrentName] = useState(currentSet.name);
@@ -17,16 +20,17 @@ export default function Title() {
     }
 
     const handleBlur = () => {
+        if (currentName === currentSet.name) {
+            setCurrentName(currentSet.name)
+        } else {
+            updateMutation.mutate({name: currentName})
+        }
         setReadOnly(true)
-        setCurrentName(currentSet.name)
-    }
-
-    const handleClick = () => {
-        updateMutation.mutate({name: currentName})
+        
     }
 
     const updateMutation = useMutation({
-        mutationFn: (data) => axios.patch(serverRoute, 
+        mutationFn: (data) => axios.patch(path, 
             JSON.stringify(data), 
             {
             headers: {
@@ -35,18 +39,9 @@ export default function Title() {
         }),
         onSuccess: (resp) => {
             queryClient.setQueryData(['sets'], oldSets => {
-                return oldSets.map(set => {
-                const data = resp.data
-                if (set.id === currentSet.id) {
-                    const filteredFlashcards = set.flashcards.filter((card) => card.id !== data.id);
-                    return {
-                        ...set, 
-                        flashcards: [...filteredFlashcards, data]
-                        .sort((a,b) => a.id - b.id)
-                    }
-                }
-                return set
-                })
+                const set = resp.data
+                const filteredSets = oldSets.filter((set) => set.id !== currentSet.id);
+                return [...filteredSets, set]
             })
         },
         onError: (error) => {
@@ -55,22 +50,17 @@ export default function Title() {
     })
 
     return (
-        <div className="flex my-2 justify-center">
+        <div 
+        className="flex my-2 justify-center"
+        onBlur={handleBlur}
+        >
             <input 
             value={currentName} 
             readOnly={readOnly} 
             className="text-2xl border-b-2 border-blue-500 hover:border-blue-700 text-center outline-none" 
             onChange={(e) => setCurrentName(e.target.value)}
             onFocus={handleFocus}
-            onBlur={handleBlur}
             />
-            { readOnly ?
-            ""
-            :
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" name="checkmark" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 stroke-green-500 hover:stroke-green-700 cursor-pointer my-0" onClick={handleClick}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg> 
-            }
         </div>
     )
 }
