@@ -50,17 +50,24 @@ export default function Title() {
     })
 
     return (
-        <div 
-        className="flex my-2 justify-center"
-        onBlur={handleBlur}
-        >
-            <input 
-            value={currentName} 
-            readOnly={readOnly} 
-            className="text-2xl border-b-2 border-blue-500 hover:border-blue-700 text-center outline-none" 
-            onChange={(e) => setCurrentName(e.target.value)}
-            onFocus={handleFocus}
-            />
-        </div>
+        <>
+            <div 
+            className="flex my-2 mt-4 justify-center"
+            onBlur={handleBlur}
+            >
+                <input 
+                value={currentName} 
+                readOnly={readOnly} 
+                className="text-2xl border-b-2 border-blue-500 hover:border-blue-700 text-center outline-none" 
+                onChange={(e) => setCurrentName(e.target.value)}
+                onFocus={handleFocus}
+                />
+            </div>
+            <>
+                <button className="border-2 p-3 text-lg rounded-full bg-blue-500 text-white hover:bg-blue-700 my-3">
+                    Save Changes
+                </button>
+            </>
+        </>
     )
 }

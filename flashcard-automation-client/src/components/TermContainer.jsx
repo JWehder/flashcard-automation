@@ -10,7 +10,8 @@ export default function TermContainer() {
         currentSet, 
         isSetsLoading, 
         displayCurrentTerms, 
-        addTerm } = useContext(Context)
+        addTerm,
+        showTitle } = useContext(Context)
 
     if (isSetsLoading) {
         return <div>Loading sets...</div>;
@@ -29,7 +30,7 @@ export default function TermContainer() {
 
     return (
         <div className="my-2">
-            <Title title={currentSet.name} />
+            { showTitle ? <Title title={currentSet.name} /> : ""}
         <>
             {shouldDisplayTerms ? 
             displayTerms() 

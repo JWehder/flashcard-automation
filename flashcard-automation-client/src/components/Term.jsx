@@ -45,6 +45,9 @@ export default function Term({ newPost, term, definition, id }) {
 
     const serverRoute = `${endpoint}/flashcards/${id}`
 
+    // in order for me to get this to work
+    // 
+
     const updateMutation = useMutation({
         mutationFn: (data) => axios.patch(serverRoute, 
             JSON.stringify(data), 

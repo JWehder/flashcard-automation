@@ -14,6 +14,7 @@ function ContextProvider({ children }) {
     const [currentSetPointer, setCurrentSetPointer] = useState();
     const [terms, setTerms] = useState([{definition: "", term: ""}]);
     const [cardError, setCardError] = useState();
+    const [showTitle, setShowTitle] = useState(true);
 
     const queryClient = useQueryClient();
 
@@ -75,7 +76,7 @@ function ContextProvider({ children }) {
     // is complete
     const hasSets = sets && sets.length > 0;
 
-    return <Context.Provider value={{ sets, isSetsLoading, hasSets, currentSetPointer, changeSet, currentSet, postMutation, setTerms, cardError, setCardError, displayCurrentTerms, addTerm }} >{children}</Context.Provider>
+    return <Context.Provider value={{ sets, isSetsLoading, hasSets, currentSetPointer, changeSet, currentSet, postMutation, setTerms, cardError, setCardError, displayCurrentTerms, addTerm, setShowTitle, showTitle }} >{children}</Context.Provider>
 }
 
 export { ContextProvider, Context }
