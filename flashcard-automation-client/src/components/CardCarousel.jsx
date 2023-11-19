@@ -57,7 +57,8 @@ export default function CardCarousel() {
                     >
                         <div className='flex items-center justify-center m-auto'>
                             <FlashCard 
-                            flashcard={currentSet.flashcards[currentFlashcardIndex]} 
+                            definition={currentSet.flashcards[currentFlashcardIndex].definition} 
+                            term={currentSet.flashcards[currentFlashcardIndex].term}
                             />
                         </div>
                     </div>
