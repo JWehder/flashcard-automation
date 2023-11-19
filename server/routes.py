@@ -45,9 +45,12 @@ def modify_sets(set_id):
 def create_flashcard():
     if request.method == 'POST':
         req_values = request.get_json()
-        term = req_values.get('definition')
-        definition = req_values.get('term')
-        set_id = req_values.get('set_id')
+        term = req_values['term']
+        definition = req_values['definition']
+        set_id = req_values['set_id']
+
+        print(term)
+        print(definition)
         
         if not term or not definition:
             return jsonify({'error': 'please include the definition and term in your request.'}), HTTP_BAD_REQUEST
@@ -64,6 +67,7 @@ def create_flashcard():
             return new_flashcard.to_dict(), HTTP_CREATED
 
         except Exception as e:
+            traceback.print_exc()
             db.session.rollback()
             return jsonify({'error': f'An error occurred: {str(e)}'}), HTTP_SERVER_ERROR
 

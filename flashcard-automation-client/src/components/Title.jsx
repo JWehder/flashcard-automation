@@ -6,7 +6,7 @@ import { endpoint } from "../Context";
 
 // eslint-disable-next-line react/prop-types
 export default function Title() {
-    const { sets, currentSetPointer, handleSaveClick } = useContext(Context);
+    const { sets, currentSetPointer } = useContext(Context);
 
     const path = `${endpoint}/sets/${currentSetPointer}`
 
@@ -63,11 +63,6 @@ export default function Title() {
                 onFocus={handleFocus}
                 />
             </div>
-            <>
-                <button className="border-2 p-3 text-lg rounded-full bg-blue-500 text-white hover:bg-blue-700 my-3" onClick={handleSaveClick}>
-                    Save Changes
-                </button>
-            </>
         </>
     )
 }

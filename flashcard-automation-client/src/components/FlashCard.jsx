@@ -10,7 +10,7 @@ export default function FlashCard({ definition, term }) {
 
     return (
         <>
-            <div className="w-[600px] h-[325px] border-2 text-center rounded-lg">
+            <div className="w-[500px] h-[325px] border-2 text-center rounded-lg">
                 { side ?
                     <div className="p-10" onClick={handleClick}> 
                         {definition}

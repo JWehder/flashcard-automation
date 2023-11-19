@@ -14,13 +14,10 @@ export default function Term({ newPost, term, definition, id }) {
         currentSetPointer, 
         setCardError, 
         cardError, 
-        batch,
-        setBatch } = useContext(Context)
+        postMutation } = useContext(Context)
 
     const [defValue, setDef] = useState("")
     const [termValue, setTerm] = useState("")
-
-    // postMutation, 
 
     useEffect(() => {
         if (definition) {
@@ -36,32 +33,51 @@ export default function Term({ newPost, term, definition, id }) {
 
     const submitEdit = () => {
         setReadOnly(true)
-        setBatch([...batch, {
-            term: termValue,
-            definition: defValue,
-            id: id
-        }])
-        // updateMutation.mutate({
-        //     term: termValue, 
-        //     definition: defValue
-        // })
+        updateMutation.mutate({
+            term: termValue, 
+            definition: defValue
+        })
     }
 
     const submitPost = () => {
         setReadOnly(true)
-        setBatch([...batch, {
+        postMutation.mutate({
             term: termValue,
             definition: defValue,
-            newPost: newPost
-        }])
-        // postMutation.mutate({
-        //     term: termValue,
-        //     definition: defValue,
-        //     set_id: sets[currentSetPointer].id
-        // })
+            set_id: sets[currentSetPointer].id
+        })
     }
 
     const serverRoute = `${endpoint}/flashcards/${id}`
+
+    const updateMutation = useMutation({
+        mutationFn: (data, route) => axios.patch(route, 
+            JSON.stringify(data), 
+            {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }),
+        onSuccess: (resp) => {
+            queryClient.setQueryData(['sets'], oldSets => {
+                return oldSets.map(set => {
+                const data = resp.data
+                if (set.id === sets[currentSetPointer].id) {
+                    const filteredFlashcards = set.flashcards.filter((card) => card.id !== data.id);
+                    return {
+                        ...set, 
+                        flashcards: [...filteredFlashcards, data]
+                        .sort((a,b) => a.id - b.id)
+                    }
+                }
+                return set
+                })
+            })
+        },
+        onError: (error) => {
+            console.log(error)
+        }
+        })
 
     const deleteMutation = useMutation({
         mutationFn: () => axios.delete(serverRoute),

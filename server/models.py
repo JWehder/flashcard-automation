@@ -74,8 +74,10 @@ class Flashcard(Base):
     def validate_term_length(self, key, term):
         if len(term) <= 0:
             raise AttributeError('Term must have more than zero characters')
+        return term
 
     @validates('definition')
     def validate_def_length(self, key, definition):
         if len(definition) <= 0:
             raise AttributeError('Definition must have more than zero characters')
+        return definition

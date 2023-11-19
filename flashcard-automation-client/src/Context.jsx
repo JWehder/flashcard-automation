@@ -15,7 +15,6 @@ function ContextProvider({ children }) {
     const [terms, setTerms] = useState([{definition: "", term: ""}]);
     const [cardError, setCardError] = useState();
     const [showTitle, setShowTitle] = useState(true);
-    const [batch, setBatch] = useState([]);
 
     const queryClient = useQueryClient();
 
@@ -31,49 +30,10 @@ function ContextProvider({ children }) {
 
     const displayCurrentTerms = terms.map((term) => <Term key={`flashcard-${uuidv4()}`} definition={term.definition} newPost term={term.term}  />)
 
-    const handleSaveClick = () => {
-        batch.forEach((val) => {
-            const serverRoute = `${endpoint}/flashcards/${val.id}`
-            if (val.newPost) {
-                postMutation.mutate(val)
-            } else {
-                updateMutation.mutate(val, serverRoute)
-            }
-        })
-    }
-
-    const updateMutation = useMutation({
-    mutationFn: (data, route) => axios.patch(route, 
-        JSON.stringify(data), 
-        {
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }),
-    onSuccess: (resp) => {
-        queryClient.setQueryData(['sets'], oldSets => {
-            return oldSets.map(set => {
-            const data = resp.data
-            if (set.id === sets[currentSetPointer].id) {
-                const filteredFlashcards = set.flashcards.filter((card) => card.id !== data.id);
-                return {
-                    ...set, 
-                    flashcards: [...filteredFlashcards, data]
-                    .sort((a,b) => a.id - b.id)
-                }
-            }
-            return set
-            })
-        })
-    },
-    onError: (error) => {
-        console.log(error)
-    }
-    })
-
     const postMutation = useMutation({
         mutationFn: (data) => axios.post(`${endpoint}/flashcards`, 
-        JSON.stringify(data), {
+        JSON.stringify(data),
+        {
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -94,9 +54,9 @@ function ContextProvider({ children }) {
         });
         },
         // Optionally, handle errors
-        onError: (error) => {
-            setCardError(error.response.data)
-            console.error("Error deleting term:", error);
+        onError: (resp) => {
+            const error = resp.response.data
+            console.log(error)
         }
     });
 
@@ -117,7 +77,7 @@ function ContextProvider({ children }) {
     // is complete
     const hasSets = sets && sets.length > 0;
 
-    return <Context.Provider value={{ sets, isSetsLoading, hasSets, currentSetPointer, changeSet, postMutation, setTerms, cardError, setCardError, displayCurrentTerms, addTerm, setShowTitle, showTitle, setBatch, batch, handleSaveClick }} >{children}</Context.Provider>
+    return <Context.Provider value={{ sets, isSetsLoading, hasSets, currentSetPointer, changeSet, postMutation, setTerms, cardError, setCardError, displayCurrentTerms, addTerm, setShowTitle, showTitle }} >{children}</Context.Provider>
 }
 
 export { ContextProvider, Context }
