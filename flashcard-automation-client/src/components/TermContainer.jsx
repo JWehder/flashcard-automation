@@ -18,12 +18,12 @@ export default function TermContainer() {
         return <div>Loading sets...</div>;
     }
 
-    const shouldDisplayTerms = !isSetsLoading && sets[currentSetPointer].flashcards.length < 1
+    const shouldDisplayTerms = !isSetsLoading && sets[currentSetPointer].flashcards.length > 0
 
     const displayTerms = () => {
 
         if (sets[currentSetPointer].flashcards.length > 0) {
-            return sets[currentSetPointer].flashcards.map((flashcard) => <Term key={`flashcard-${flashcard.id}`} id={flashcard.id} term={flashcard.answer} definition={flashcard.question} />);
+            return sets[currentSetPointer].flashcards.map((flashcard) => <Term key={`flashcard-${flashcard.id}`} id={flashcard.id} term={flashcard.term} definition={flashcard.definition} />);
         } else {
             return [];
         }

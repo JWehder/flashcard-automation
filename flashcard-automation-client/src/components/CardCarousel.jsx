@@ -1,5 +1,5 @@
 import { useRef, useContext, useState } from 'react'
-import FlashCard from './FlashCard'
+import Flashcard from './FlashCard'
 import { Context } from '../Context'
 import { useEffect } from 'react'
 
@@ -27,7 +27,7 @@ export default function CardCarousel() {
         }
         
         scrollContainer.current.style.scrollBehavior = 'smooth'
-        scrollContainer.current.scrollLeft -= 400
+        scrollContainer.current.scrollLeft -= 530
     }
 
     const handleNextClick = () => {
@@ -36,30 +36,36 @@ export default function CardCarousel() {
         }
 
         scrollContainer.current.style.scrollBehavior = 'smooth'
-        scrollContainer.current.scrollLeft += 400
+        scrollContainer.current.scrollLeft += 530
+    }
+
+    const displayFlashcards = () => {
+        return sets[currentSetPointer].flashcards.map((card) => {
+            return <Flashcard key={`${card}-${card.id}`} definition={card.definition} term={card.term} />
+        })  
     }
 
     return (
         <div>
             { sets[currentSetPointer].flashcards.length > 0 ?
             <>
-            <div className='flex justify-center items-center mt-8'>
+            <div 
+            className='flex justify-center items-center mt-8 w-[600px] scrollbar-hide'
+            onScroll={}
+            >
                 {/* handle the back click to the previous flashcard */}
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 cursor-pointer mx-2" onClick={handleBackClick}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                 </svg>
-                <div className='w-1000px flex overflow-x-auto items-center justify-center'>
+                <div className='flex overflow-x-auto items-center justify-center scrollbar-hide'>
                     {/* <StyledIcon onClick={handleBackClick} /> */}
 
                     <div 
-                    className='flex flex-nowrap overflow-x-auto h-315px overflow-scroll -webkit-scrollbar:none:' 
+                    className='flex flex-nowrap overflow-x-auto h-315px overflow-scroll scrollbar-hide' 
                     ref={scrollContainer}
                     >
-                        <div className='flex items-center justify-center m-auto'>
-                            <FlashCard 
-                            definition={sets[currentSetPointer].flashcards[currentFlashcardIndex].definition} 
-                            term={sets[currentSetPointer].flashcards[currentFlashcardIndex].term}
-                            />
+                        <div className='flex items-center justify-center m-auto scrollbar-hide'>
+                            {displayFlashcards()}
                         </div>
                     </div>
                     {/* <StyledIcon as={ArrowRightIcon} onClick={handleNextClick} /> */}
