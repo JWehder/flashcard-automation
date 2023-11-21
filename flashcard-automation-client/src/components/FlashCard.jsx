@@ -3,11 +3,7 @@ import { CSSTransition } from "react-transition-group";
 
 // eslint-disable-next-line react/prop-types
 export default function Flashcard({ definition, term }) {
-    const [side, setSide] = useState(true)
-
-    const handleClick = () => {
-        setSide(!side)
-    }
+    const [showFront, setShowFront] = useState(true);
 
     const handleArrowClicks = (e) => {
         if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
@@ -18,11 +14,16 @@ export default function Flashcard({ definition, term }) {
     return (
         <>
             <div className="w-[500px] h-[325px] border-2 text-center rounded-lg mx-4 hover:cursor-pointer flip-card card-container"
-            onClick={handleClick}
             onKeyDown={(e) => handleArrowClicks(e)}
             >
-                <CSSTransition>
-                    <div className="w-full h-full rounded-full relative card">
+                <CSSTransition
+                    in={showFront}
+                    timeout={300}
+                    classNames='flip'
+                >
+                    <div className="w-full h-full rounded-full relative card" onClick={() => {
+                        setShowFront((v) => !v);
+                    }}>
                         <div id="card-front" className="p-10 h-full w-full flex justify-center align-center absolute card-front"> 
                             {definition}
                         </div>

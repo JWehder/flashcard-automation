@@ -13,6 +13,10 @@
     scrollbar-width: none;  /* Firefox */
 }
 
+.card-container {
+    perspective: 1000px;
+}
+
 .card {
     /* sizing */
     height: 100%;
@@ -34,14 +38,21 @@
 .card-front {
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-
-
-}
-
-.card-front {
-
 }
 
 .card-back {
+    transform: rotateY(180deg);
+}
+
+.flip-exit {
+    transform: rotateY(0deg);
+}
+
+.flip-exit-active {
+    transform: rotateY(180deg);
+    transition: transform 100ms;
+}
+
+.flip-exit-done {
     transform: rotateY(180deg);
 }
