@@ -12,3 +12,36 @@
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 }
+
+.card {
+    /* sizing */
+    height: 100%;
+    width: 100%;
+
+    transform-style: preserve-3d;
+
+    /* current alignment */
+    position: relative;
+
+    transition: transform 1000ms;
+}
+
+.card:hover {
+    transform: rotateY(180deg);
+}
+
+.card-back,
+.card-front {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+
+
+}
+
+.card-front {
+
+}
+
+.card-back {
+    transform: rotateY(180deg);
+}

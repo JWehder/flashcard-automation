@@ -45,26 +45,37 @@ export default function CardCarousel() {
         })  
     }
 
+    const handleArrowClicks = (e) => {
+        if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+            e.preventDefault();
+        }
+    }
+
     return (
         <div>
             { sets[currentSetPointer].flashcards.length > 0 ?
             <>
             <div 
             className='flex justify-center items-center mt-8 w-[600px] scrollbar-hide'
-            onScroll={}
+            onKeyDown={(e) => handleArrowClicks(e)}
+            tabIndex={0}
             >
                 {/* handle the back click to the previous flashcard */}
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 cursor-pointer mx-2" onClick={handleBackClick}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                 </svg>
-                <div className='flex overflow-x-auto items-center justify-center scrollbar-hide'>
+                <div 
+                className='flex overflow-x-auto items-center justify-center scrollbar-hide'
+                >
                     {/* <StyledIcon onClick={handleBackClick} /> */}
 
                     <div 
                     className='flex flex-nowrap overflow-x-auto h-315px overflow-scroll scrollbar-hide' 
                     ref={scrollContainer}
                     >
-                        <div className='flex items-center justify-center m-auto scrollbar-hide'>
+                        <div 
+                        className='flex items-center justify-center m-auto scrollbar-hide'
+                        >
                             {displayFlashcards()}
                         </div>
                     </div>
