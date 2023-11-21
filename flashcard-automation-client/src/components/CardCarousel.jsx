@@ -52,48 +52,50 @@ export default function CardCarousel() {
     }
 
     return (
-        <div>
-            { sets[currentSetPointer].flashcards.length > 0 ?
             <>
-            <div 
-            className='flex justify-center items-center mt-8 w-[600px] scrollbar-hide'
-            onKeyDown={(e) => handleArrowClicks(e)}
-            tabIndex={0}
-            >
-                {/* handle the back click to the previous flashcard */}
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 cursor-pointer mx-2" onClick={handleBackClick}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                </svg>
+            <div className='flex justify-center items-center w-full h-[400px]'>
+                { sets[currentSetPointer].flashcards.length > 0 ?
+                <>
                 <div 
-                className='flex overflow-x-auto items-center justify-center scrollbar-hide h-[350px]'
+                className='flex justify-center items-center mt-8 w-[600px] scrollbar-hide'
+                onKeyDown={(e) => handleArrowClicks(e)}
+                tabIndex={0}
                 >
-                    {/* <StyledIcon onClick={handleBackClick} /> */}
-
+                    {/* handle the back click to the previous flashcard */}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 cursor-pointer mx-2" onClick={handleBackClick}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
                     <div 
-                    className='flex flex-nowrap overflow-x-auto h-[350px] overflow-scroll scrollbar-hide' 
-                    ref={scrollContainer}
+                    className='flex overflow-x-auto items-center justify-center scrollbar-hide h-[400px]'
                     >
+                        {/* <StyledIcon onClick={handleBackClick} /> */}
+
                         <div 
-                        className='flex items-center justify-center m-auto scrollbar-hide'
+                        className='flex flex-nowrap overflow-x-auto h-[350px] overflow-scroll scrollbar-hide' 
+                        ref={scrollContainer}
                         >
-                            {displayFlashcards()}
+                            <div 
+                            className='flex items-center justify-center m-auto scrollbar-hide h-full'
+                            >
+                                {displayFlashcards()}
+                            </div>
                         </div>
+                        {/* <StyledIcon as={ArrowRightIcon} onClick={handleNextClick} /> */}
                     </div>
-                    {/* <StyledIcon as={ArrowRightIcon} onClick={handleNextClick} /> */}
+                    {/* handle the click to the next flashcard */}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 cursor-pointer mx-2" onClick={handleNextClick}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
                 </div>
-                {/* handle the click to the next flashcard */}
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 cursor-pointer mx-2" onClick={handleNextClick}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
+                </>
+                :
+                <div>Sorry, there are no flashcards to display... Create one!</div>
+                }
             </div>
-            <div className='mb-8'>
+                <div className='mb-8'>
                 {currentFlashcardIndex + 1} / {sets[currentSetPointer].flashcards.length}
             </div>
             </>
-            :
-            <div>Sorry, there are no flashcards to display... Create one!</div>
-            }
-        </div>
     )
 }
 

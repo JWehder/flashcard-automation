@@ -30,10 +30,6 @@
     transition: transform 1000ms;
 }
 
-.card:hover {
-    transform: rotateY(180deg);
-}
-
 .card-back,
 .card-front {
     -webkit-backface-visibility: hidden;
@@ -50,9 +46,22 @@
 
 .flip-exit-active {
     transform: rotateY(180deg);
-    transition: transform 100ms;
+    transition: transform 300ms;
 }
 
 .flip-exit-done {
     transform: rotateY(180deg);
+}
+
+.flip-enter {
+    transform: rotateY(180deg);
+}
+
+.flip-enter-active {
+    transform: rotateY(0deg);
+    transition: transform 300ms;
+}
+
+.flip-enter-done {
+    transform: rotateY(0deg);
 }
