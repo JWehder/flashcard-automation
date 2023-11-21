@@ -65,12 +65,12 @@ export default function CardCarousel() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                 </svg>
                 <div 
-                className='flex overflow-x-auto items-center justify-center scrollbar-hide'
+                className='flex overflow-x-auto items-center justify-center scrollbar-hide h-[350px]'
                 >
                     {/* <StyledIcon onClick={handleBackClick} /> */}
 
                     <div 
-                    className='flex flex-nowrap overflow-x-auto h-315px overflow-scroll scrollbar-hide' 
+                    className='flex flex-nowrap overflow-x-auto h-[350px] overflow-scroll scrollbar-hide' 
                     ref={scrollContainer}
                     >
                         <div 

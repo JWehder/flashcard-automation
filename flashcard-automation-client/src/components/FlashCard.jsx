@@ -13,7 +13,7 @@ export default function Flashcard({ definition, term }) {
 
     return (
         <>
-            <div className="w-[500px] h-[325px] border-2 text-center rounded-lg mx-4 hover:cursor-pointer flip-card card-container"
+            <div className="w-[500px] h-[325px] text-center mx-4 hover:cursor-pointer flip-card card-container"
             onKeyDown={(e) => handleArrowClicks(e)}
             >
                 <CSSTransition
@@ -21,7 +21,7 @@ export default function Flashcard({ definition, term }) {
                     timeout={300}
                     classNames='flip'
                 >
-                    <div className="w-full h-full rounded-full relative card" onClick={() => {
+                    <div className="w-full border-2 h-full rounded-lg relative card" onClick={() => {
                         setShowFront((v) => !v);
                     }}>
                         <div id="card-front" className="p-10 h-full w-full flex justify-center align-center absolute card-front"> 
