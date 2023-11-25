@@ -1,7 +1,6 @@
 import { useRef, useContext, useState } from 'react'
 import Flashcard from './FlashCard'
 import { Context } from '../Context'
-import { useEffect } from 'react'
 
 export default function CardCarousel() {
     const { sets, currentSetPointer } = useContext(Context)
@@ -9,29 +8,28 @@ export default function CardCarousel() {
     // have a state variable to handle changes in the query value
     // ensure the query value input has no border
 
-    const scrollContainer = useRef(null)
-
-    const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState(0);
+    const scrollContainer = useRef(null);
     const [queryVal, setQueryVal] = useState(1);
-
-    useEffect(() => {
-        if (currentSetPointer) {
-            setCurrentFlashcardIndex(0)
-        }
-
-    }, [currentSetPointer])
 
     if (!sets) {
         return <div>Loading flashcards...</div>
     }
 
     const handleFlashcardQuery = (val) => {
+        // handle the edge case for an undefined value or backspace
+        if (!val) {
+            setQueryVal("");
+            return;
+        }
+
         const intVal = parseInt(val)
+        if (intVal > sets[currentSetPointer].flashcards.length || intVal <= 0) {
+            setQueryVal(1);
+            return;
+        } 
         // the value represented within the input box
         setQueryVal(intVal);
         // flip through cards until we get to the requested card
-        console.log(queryVal, intVal);
-        console.log(typeof queryVal, typeof intVal);
         flipThroughCards(queryVal, intVal);
 
     }
@@ -39,23 +37,25 @@ export default function CardCarousel() {
     // creating another function to actually handle the action of flipping 
     // through the cards
     const flipThroughCards = (prevVal, newVal) => {
-        console.log(prevVal, newVal);
-        if (newVal > sets[currentSetPointer].flashcards.length || newVal <= 0) {
-            return;
-        } 
-        
+        let tmpPrevVal = prevVal
         if (prevVal < newVal) {
-            while (prevVal < newVal) {
+            // shift the scroll container over until the previous value meets 
+            // the requested value
+            while (tmpPrevVal < newVal) {
                 // essentially clicking the back arrow for you
                 shiftScrollContainer("forward");
+                tmpPrevVal++;
             }
         } else if (prevVal > newVal) {
-            while (prevVal > newVal) {
+            // shift the scroll container over until the previous value meets 
+            // the requested value
+            while (tmpPrevVal > newVal) {
                 // essentially clicking through the cards for you
                 shiftScrollContainer("back");
+                tmpPrevVal--;
             }
         }
-        setCurrentFlashcardIndex(newVal);
+        setQueryVal(newVal);
     }
 
     const shiftScrollContainer = (direction) => {
@@ -69,15 +69,25 @@ export default function CardCarousel() {
     }
 
     const handleBackClick = () => {
-        if (currentFlashcardIndex !== 0) {
-            setCurrentFlashcardIndex(currentFlashcardIndex - 1);
+        let tmpVal = queryVal
+        if (typeof tmpVal !== "number") {
+            tmpVal = parseInt(tmpVal)
+        }
+
+        if (queryVal !== 0) {
+            setQueryVal(tmpVal - 1);
         }
         shiftScrollContainer("back");
     }
 
     const handleNextClick = () => {
-        if (sets[currentSetPointer].flashcards[currentFlashcardIndex + 1]) {
-            setCurrentFlashcardIndex(currentFlashcardIndex + 1);
+        let tmpVal = queryVal
+        if (typeof tmpVal !== "number") {
+            tmpVal = parseInt(tmpVal)
+        }
+           
+        if (sets[currentSetPointer].flashcards[queryVal]) {
+            setQueryVal(tmpVal + 1);
         }
         shiftScrollContainer("forward");
     }
@@ -100,7 +110,7 @@ export default function CardCarousel() {
                 { sets[currentSetPointer].flashcards.length > 0 ?
                 <>
                 <div 
-                className='flex justify-center items-center mt-8 w-[600px] scrollbar-hide'
+                className='flex justify-center items-center mt-8 w-[585px] scrollbar-hide'
                 onKeyDown={(e) => handleArrowClicks(e)}
                 tabIndex={0}
                 >
@@ -141,41 +151,8 @@ export default function CardCarousel() {
                 onChange={(e) => handleFlashcardQuery(e.target.value)}
                 className='border-none outline-none w-2'
                 />
-                / {sets[currentSetPointer].flashcards.length}
+                {" "} / {sets[currentSetPointer].flashcards.length}
             </div>
             </>
     )
 }
-
-// const Gallery = styled.div`
-//     width: 1000px;
-//     display: flex;
-//     overflow-x: scroll;
-//     align-items: center;
-//     justify-content:center;
-
-// `
-
-// const List = styled.div`
-//     display: flex;
-//     flex-wrap: nowrap;
-//     overflow-x: auto;
-//     height: 315px;
-//     overflow: scroll;
-
-//     &::-webkit-scrollbar {
-//         display: none;
-//     }
-// `
-
-// const GalleryWrap = styled.div`
-//     display: flex;
-//     align-items: center;
-//     justify-content: center;
-//     margin: 10% auto;
-// `
-
-// const StyledIcon = styled(Icon)`
-//     cursor: pointer;
-//     margin: 2px;
-// `
