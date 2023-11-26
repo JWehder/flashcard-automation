@@ -1,12 +1,11 @@
 import { useRef, useContext, useState } from 'react'
 import Flashcard from './FlashCard'
 import { Context } from '../Context'
+import BackButton from '../icons/backbutton';
+import NextButton from '../icons/nextButton';
 
 export default function CardCarousel() {
     const { sets, currentSetPointer } = useContext(Context)
-    // make the the first value describe the current value being shown in the flashcard
-    // have a state variable to handle changes in the query value
-    // ensure the query value input has no border
 
     const scrollContainer = useRef(null);
     const [queryVal, setQueryVal] = useState(1);
@@ -74,10 +73,10 @@ export default function CardCarousel() {
             tmpVal = parseInt(tmpVal)
         }
 
-        if (queryVal !== 0) {
+        if (tmpVal !== 0 && (tmpVal - 1) !== 0) {
             setQueryVal(tmpVal - 1);
+            shiftScrollContainer("back");
         }
-        shiftScrollContainer("back");
     }
 
     const handleNextClick = () => {
@@ -90,6 +89,10 @@ export default function CardCarousel() {
             setQueryVal(tmpVal + 1);
         }
         shiftScrollContainer("forward");
+    }
+
+    const handleWheel = () => {
+        console.log(scrollContainer.current.scrollLeft);
     }
 
     const displayFlashcards = () => {
@@ -106,7 +109,8 @@ export default function CardCarousel() {
 
     return (
             <>
-            <div className='flex justify-center items-center w-full h-[400px]'>
+            <div 
+            className='flex justify-center items-center w-full h-full'>
                 { sets[currentSetPointer].flashcards.length > 0 ?
                 <>
                 <div 
@@ -114,18 +118,15 @@ export default function CardCarousel() {
                 onKeyDown={(e) => handleArrowClicks(e)}
                 tabIndex={0}
                 >
-                    {/* handle the back click to the previous flashcard */}
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 cursor-pointer mx-2" onClick={handleBackClick}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                    </svg>
+                    <BackButton handleBackClick={handleBackClick} />
                     <div 
                     className='flex overflow-x-auto items-center justify-center scrollbar-hide h-[400px]'
                     >
-                        {/* <StyledIcon onClick={handleBackClick} /> */}
 
                         <div 
                         className='flex flex-nowrap overflow-x-auto h-[350px] overflow-scroll scrollbar-hide' 
                         ref={scrollContainer}
+                        onWheel={() => handleWheel()}
                         >
                             <div 
                             className='flex items-center justify-center m-auto scrollbar-hide h-full'
@@ -133,12 +134,9 @@ export default function CardCarousel() {
                                 {displayFlashcards()}
                             </div>
                         </div>
-                        {/* <StyledIcon as={ArrowRightIcon} onClick={handleNextClick} /> */}
                     </div>
                     {/* handle the click to the next flashcard */}
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 cursor-pointer mx-2" onClick={handleNextClick}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                    </svg>
+                    <NextButton handleNextClick={handleNextClick} />
                 </div>
                 </>
                 :
@@ -149,7 +147,7 @@ export default function CardCarousel() {
                 <input
                 value={queryVal}
                 onChange={(e) => handleFlashcardQuery(e.target.value)}
-                className='border-none outline-none w-2'
+                className='border-none outline-none w-2 text-blue-500'
                 />
                 {" "} / {sets[currentSetPointer].flashcards.length}
             </div>
