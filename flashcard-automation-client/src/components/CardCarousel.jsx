@@ -9,6 +9,7 @@ export default function CardCarousel() {
 
     const scrollContainer = useRef(null);
     const [queryVal, setQueryVal] = useState(1);
+    const [wheelThreshold, setWheelThreshold] = useState(0);
 
     if (!sets) {
         return <div>Loading flashcards...</div>
@@ -17,7 +18,7 @@ export default function CardCarousel() {
     const handleFlashcardQuery = (val) => {
         // handle the edge case for an undefined value or backspace
         if (!val) {
-            setQueryVal("");
+            setQueryVal(queryVal);
             return;
         }
 
@@ -50,6 +51,7 @@ export default function CardCarousel() {
             // the requested value
             while (tmpPrevVal > newVal) {
                 // essentially clicking through the cards for you
+                console.log(tmpPrevVal);
                 shiftScrollContainer("back");
                 tmpPrevVal--;
             }
@@ -92,12 +94,32 @@ export default function CardCarousel() {
     }
 
     const handleWheel = () => {
-        console.log(scrollContainer.current.scrollLeft);
+        let tmpVal = parseInt(queryVal);
+        if (scrollContainer.current.scrollLeft > (wheelThreshold + 350)) {
+            setWheelThreshold(wheelThreshold + 350);
+            if (sets[currentSetPointer].flashcards[tmpVal]) {
+                setQueryVal(tmpVal + 1);
+            }
+        } else if (scrollContainer.current.scrollLeft <= (wheelThreshold - 350)) {
+            setWheelThreshold(wheelThreshold - 350);
+            if (sets[currentSetPointer].flashcards[tmpVal - 1]) {
+                setQueryVal(tmpVal - 1);
+            }
+        } else {
+            return;
+        }
     }
 
     const displayFlashcards = () => {
-        return sets[currentSetPointer].flashcards.map((card) => {
-            return <Flashcard key={`${card}-${card.id}`} definition={card.definition} term={card.term} />
+        return sets[currentSetPointer].flashcards.map((card, index) => {
+            return (
+                <Flashcard 
+                key={`${card}-${card.id}`} 
+                definition={card.definition} 
+                term={card.term} 
+                index={index}
+                />
+            ) 
         })  
     }
 
@@ -124,7 +146,7 @@ export default function CardCarousel() {
                     >
 
                         <div 
-                        className='flex flex-nowrap overflow-x-auto h-[350px] overflow-scroll scrollbar-hide' 
+                        className='flex flex-nowrap overflow-x-auto h-full overflow-scroll scrollbar-hide' 
                         ref={scrollContainer}
                         onWheel={() => handleWheel()}
                         >

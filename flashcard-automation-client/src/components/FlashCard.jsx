@@ -1,15 +1,22 @@
 import { useState } from "react";
 import { CSSTransition } from "react-transition-group";
 import Star from "../icons/star";
+import { useContext } from "react";
+import { Context } from "../Context";
 
 // eslint-disable-next-line react/prop-types
-export default function Flashcard({ definition, term }) {
+export default function Flashcard({ definition, term, index }) {
+    const { setSaved, saved } = useContext(Context);
     const [showFront, setShowFront] = useState(true);
 
     const handleArrowClicks = (e) => {
         if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
             e.preventDefault();
         }
+    }
+
+    const save = () => {
+        setSaved([...saved, index])
     }
 
     return (
@@ -26,7 +33,7 @@ export default function Flashcard({ definition, term }) {
                         setShowFront((v) => !v);
                     }}>
                         <div className="justify-left p-5">
-                            <Star />
+                            <Star onClick={save} />
                         </div>
                         <div id="card-front" className="p-10 h-full w-full flex justify-center align-center absolute card-front"> 
                             {definition}

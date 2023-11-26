@@ -6,7 +6,12 @@ import axios from "axios";
 import { endpoint } from "../Context";
 
 export default function Header() {
-    const { sets, changeSet, hasSets, setShowTitle } = useContext(Context);
+    const { 
+        sets, 
+        changeSet, 
+        hasSets, 
+        setShowTitle,
+        saved } = useContext(Context);
     const [showForm, setShowForm] = useState("");
     const [setName, setSetName] = useState("");
 
@@ -57,6 +62,7 @@ export default function Header() {
                 <button className="rounded-full bg-blue-500 hover:bg-blue-700 mx-4 my-3 p-1.5 text-sm text-white border-2" onClick={() => addFormClick()}>
                     create new set +
                 </button>
+                <span className="hover:text-blue-700 text-blue-500 cursor-pointer">Saved({saved.length})</span>
             </>
             { showForm ?
                 <div className="flex justify-center mt-4">
