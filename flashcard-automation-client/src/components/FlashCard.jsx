@@ -35,7 +35,7 @@ export default function Flashcard({ definition, term, index }) {
                         setShowFront((v) => !v);
                     }}>
                         <div className="justify-left p-5">
-                            <Star onClick={save} saved={saved} />
+                            <Star onClick={save} saved />
                         </div>
                         <div id="card-front" className="p-10 h-full w-full flex justify-center align-center absolute card-front"> 
                             {definition}

@@ -120,7 +120,7 @@ export default function CardCarousel() {
             return sets[currentSetPointer].flashcards.map((card, index) => {
                 return (
                     <Flashcard 
-                    key={`${card}-${card.id}`} 
+                    key={`card-${card.id}`} 
                     definition={card.definition} 
                     term={card.term} 
                     index={index}
@@ -142,6 +142,8 @@ export default function CardCarousel() {
         }
 
     }
+
+    console.log(displayFlashcards());
 
     const handleArrowClicks = (e) => {
         if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
