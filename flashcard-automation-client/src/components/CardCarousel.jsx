@@ -5,7 +5,11 @@ import BackButton from '../icons/backbutton';
 import NextButton from '../icons/nextButton';
 
 export default function CardCarousel() {
-    const { sets, currentSetPointer } = useContext(Context)
+    const { 
+        sets, 
+        currentSetPointer, 
+        showSaved, 
+        saved } = useContext(Context)
 
     const scrollContainer = useRef(null);
     const [queryVal, setQueryVal] = useState(1);
@@ -111,16 +115,32 @@ export default function CardCarousel() {
     }
 
     const displayFlashcards = () => {
-        return sets[currentSetPointer].flashcards.map((card, index) => {
-            return (
-                <Flashcard 
-                key={`${card}-${card.id}`} 
-                definition={card.definition} 
-                term={card.term} 
-                index={index}
-                />
-            ) 
-        })  
+
+        if (sets && !showSaved) {
+            return sets[currentSetPointer].flashcards.map((card, index) => {
+                return (
+                    <Flashcard 
+                    key={`${card}-${card.id}`} 
+                    definition={card.definition} 
+                    term={card.term} 
+                    index={index}
+                    />
+                ) 
+            })  
+        } else if (showSaved) {
+            return saved.map((savedIndex) => {
+                let card = sets[currentSetPointer].flashcards[savedIndex]
+                return ( 
+                    <Flashcard 
+                    key={`${card}-${card.id}`} 
+                    definition={card.definition} 
+                    term={card.term} 
+                    index={savedIndex}
+                    />
+                )
+            })
+        }
+
     }
 
     const handleArrowClicks = (e) => {

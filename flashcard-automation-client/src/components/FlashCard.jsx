@@ -6,7 +6,9 @@ import { Context } from "../Context";
 
 // eslint-disable-next-line react/prop-types
 export default function Flashcard({ definition, term, index }) {
-    const { setSaved, saved } = useContext(Context);
+    const { 
+        setSaved, 
+        saved } = useContext(Context);
     const [showFront, setShowFront] = useState(true);
 
     const handleArrowClicks = (e) => {
@@ -33,7 +35,7 @@ export default function Flashcard({ definition, term, index }) {
                         setShowFront((v) => !v);
                     }}>
                         <div className="justify-left p-5">
-                            <Star onClick={save} />
+                            <Star onClick={save} saved={saved} />
                         </div>
                         <div id="card-front" className="p-10 h-full w-full flex justify-center align-center absolute card-front"> 
                             {definition}
