@@ -43,7 +43,6 @@ for _ in range(4):
         db.session.add(flashcard)
     x+=1
 
-db.session.commit()
-
 with app.app_context():
-    print(Flashcard.query.all())
+    db.session.commit()
+

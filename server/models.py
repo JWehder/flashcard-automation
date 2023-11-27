@@ -64,6 +64,7 @@ class Flashcard(Base):
     term = db.Column(db.String, nullable=False)
     definition = db.Column(db.String, nullable=False)
     set_id = db.Column('set_id', db.Integer, db.ForeignKey('sets.id'))
+    saved = db.Column(db.Boolean, default=False)
 
     set = db.relationship("Set", back_populates="flashcards")
 
