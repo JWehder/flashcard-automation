@@ -1,4 +1,4 @@
-import { useRef, useContext, useState } from 'react'
+import { useRef, useContext, useState, useEffect } from 'react'
 import Flashcard from './FlashCard'
 import { Context } from '../Context'
 import BackButton from '../icons/backbutton';
@@ -12,8 +12,23 @@ export default function CardCarousel() {
         savedFlashcards } = useContext(Context)
 
     const scrollContainer = useRef(null);
-    const [queryVal, setQueryVal] = useState(1);
+    const [queryVal, setQueryVal] = useState('1');
     const [wheelThreshold, setWheelThreshold] = useState(0);
+    const inputRef = useRef(null)
+
+    useEffect(() => {
+
+        // Function to update the width of the input
+        const updateInputWidth = () => {
+            const minWidth = 10; // Minimum width in pixels
+            const charWidth = 10; // Average width per character in pixels
+            const newWidth = Math.max(queryVal.length * charWidth, minWidth);
+            inputRef.current.style.width = `${newWidth}px`;
+        };
+
+        // Update the width on render and value change
+        updateInputWidth();
+    }, [queryVal]);
 
     if (!sets) {
         return <div>Loading flashcards...</div>
@@ -26,9 +41,9 @@ export default function CardCarousel() {
             return;
         }
 
-        const intVal = parseInt(val)
+        const intVal = val
         if (intVal > sets[currentSetPointer].flashcards.length || intVal <= 0) {
-            setQueryVal(1);
+            setQueryVal("1");
             return;
         } 
         // the value represented within the input box
@@ -99,14 +114,14 @@ export default function CardCarousel() {
 
     const handleWheel = () => {
         let tmpVal = parseInt(queryVal);
-        if (scrollContainer.current.scrollLeft > (wheelThreshold + 350)) {
-            setWheelThreshold(wheelThreshold + 350);
+        if (scrollContainer.current.scrollLeft > (wheelThreshold + 325)) {
+            setWheelThreshold(wheelThreshold + 325);
             if (sets[currentSetPointer].flashcards[tmpVal]) {
                 setQueryVal(tmpVal + 1);
             }
-        } else if (scrollContainer.current.scrollLeft <= (wheelThreshold - 350)) {
-            setWheelThreshold(wheelThreshold - 350);
-            if (sets[currentSetPointer].flashcards[tmpVal - 1]) {
+        } else if (scrollContainer.current.scrollLeft <= (wheelThreshold - 325)) {
+            setWheelThreshold(wheelThreshold - 325);
+            if (tmpVal - 1 !== 0) {
                 setQueryVal(tmpVal - 1);
             }
         } else {
@@ -189,10 +204,11 @@ export default function CardCarousel() {
                 <div className='mb-8'>
                 <input
                 value={queryVal}
+                ref={inputRef}
                 onChange={(e) => handleFlashcardQuery(e.target.value)}
-                className='border-none outline-none w-2 text-blue-500'
+                className='border-none outline-none w-[10px] text-blue-500 text-center'
                 />
-                {" "} / {showSaved ? 
+                 / {showSaved ? 
                 savedFlashcards.length : 
                 sets[currentSetPointer].flashcards.length}
             </div>
