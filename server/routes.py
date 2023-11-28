@@ -71,6 +71,19 @@ def create_flashcard():
             db.session.rollback()
             return jsonify({'error': f'An error occurred: {str(e)}'}), HTTP_SERVER_ERROR
 
+@app.route('/saved_flashcards/<int:id>', methods=['PATCH'])
+def modify_saved_flashcards(id):
+    if request.method == 'PATCH':
+        flashcard = Flashcard.query.filter_by(id=id).first()
+
+        if flashcard is None:
+            return { 'error': 'Flashcard not found' }, HTTP_NOT_FOUND
+
+        flashcard.saved = not flashcard.saved
+        db.session.commit()
+
+        return jsonify({'success': True}), 200
+
 @app.route('/flashcards/<int:id>', methods=['DELETE', 'PATCH'])
 def modify_flashcards(id):
 

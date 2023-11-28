@@ -15,7 +15,7 @@ export default function TermContainer() {
         addTerm,
         showTitle,
         showSaved,
-        saved } = useContext(Context)
+        savedFlashcards } = useContext(Context)
 
     if (isSetsLoading) {
         return <div>Loading sets...</div>;
@@ -28,8 +28,7 @@ export default function TermContainer() {
         if (sets[currentSetPointer].flashcards.length > 0 && !showSaved) {
             return sets[currentSetPointer].flashcards.map((flashcard) => <Term key={`flashcard-${flashcard.id}`} id={flashcard.id} term={flashcard.term} definition={flashcard.definition} />);
         } else if (showSaved) {
-            return saved.map((savedIndex) => {
-                let flashcard = sets[currentSetPointer].flashcards[savedIndex]
+            return savedFlashcards.map((flashcard) => {
                 return <Term key={`flashcard-${flashcard.id}`} id={flashcard.id} term={flashcard.term} definition={flashcard.definition} />
             })
         } else {

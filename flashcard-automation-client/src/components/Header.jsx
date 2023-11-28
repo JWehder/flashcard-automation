@@ -11,7 +11,9 @@ export default function Header() {
         changeSet, 
         hasSets, 
         setShowTitle,
-        saved } = useContext(Context);
+        currentSetPointer,
+        setShowSaved,
+        showSaved } = useContext(Context);
     const [showForm, setShowForm] = useState("");
     const [setName, setSetName] = useState("");
 
@@ -48,6 +50,10 @@ export default function Header() {
         addMutation.mutate(setName);
     }
 
+    if (!sets) {
+        return;
+    }
+
     return (
         <div>
             <>
@@ -62,7 +68,12 @@ export default function Header() {
                 <button className="rounded-full bg-blue-500 hover:bg-blue-700 mx-4 my-3 p-1.5 text-sm text-white border-2" onClick={() => addFormClick()}>
                     create new set +
                 </button>
-                <span className="hover:text-blue-700 text-blue-500 cursor-pointer">Saved({saved.length})</span>
+                <span 
+                className="hover:text-blue-700 text-blue-500 cursor-pointer"
+                onClick={() => setShowSaved(!showSaved)}
+                >{showSaved ? "Unshow " : "Saved "}({
+                    (sets[currentSetPointer].flashcards.filter((card) => card.saved)).length
+                })</span>
             </>
             { showForm ?
                 <div className="flex justify-center mt-4">

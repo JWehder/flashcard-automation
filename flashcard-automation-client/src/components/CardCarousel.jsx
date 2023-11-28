@@ -8,8 +8,8 @@ export default function CardCarousel() {
     const { 
         sets, 
         currentSetPointer, 
-        showSaved, 
-        saved } = useContext(Context)
+        showSaved,
+        savedFlashcards } = useContext(Context)
 
     const scrollContainer = useRef(null);
     const [queryVal, setQueryVal] = useState(1);
@@ -74,9 +74,9 @@ export default function CardCarousel() {
     }
 
     const handleBackClick = () => {
-        let tmpVal = queryVal
+        let tmpVal = queryVal;
         if (typeof tmpVal !== "number") {
-            tmpVal = parseInt(tmpVal)
+            tmpVal = parseInt(tmpVal);
         }
 
         if (tmpVal !== 0 && (tmpVal - 1) !== 0) {
@@ -86,9 +86,9 @@ export default function CardCarousel() {
     }
 
     const handleNextClick = () => {
-        let tmpVal = queryVal
+        let tmpVal = queryVal;
         if (typeof tmpVal !== "number") {
-            tmpVal = parseInt(tmpVal)
+            tmpVal = parseInt(tmpVal);
         }
            
         if (sets[currentSetPointer].flashcards[queryVal]) {
@@ -115,35 +115,32 @@ export default function CardCarousel() {
     }
 
     const displayFlashcards = () => {
-
-        if (sets && !showSaved) {
-            return sets[currentSetPointer].flashcards.map((card, index) => {
-                return (
-                    <Flashcard 
-                    key={`card-${card.id}`} 
-                    definition={card.definition} 
-                    term={card.term} 
-                    index={index}
-                    />
-                ) 
-            })  
-        } else if (showSaved) {
-            return saved.map((savedIndex) => {
-                let card = sets[currentSetPointer].flashcards[savedIndex]
-                return ( 
-                    <Flashcard 
-                    key={`${card}-${card.id}`} 
-                    definition={card.definition} 
-                    term={card.term} 
-                    index={savedIndex}
-                    />
-                )
-            })
-        }
-
+        return sets[currentSetPointer].flashcards.map((card) => {
+            return (
+                <Flashcard 
+                key={`card-${card.id}`} 
+                id={card.id}
+                definition={card.definition} 
+                term={card.term} 
+                saved={card.saved}
+                />
+            );
+        })  
     }
 
-    console.log(displayFlashcards());
+    const displaySavedFlashcards = () => {
+        return savedFlashcards.map((card) => {
+            return (
+                <Flashcard 
+                key={`card-${card.id}`} 
+                id={card.id}
+                definition={card.definition} 
+                term={card.term} 
+                saved={card.saved}
+                />
+            );
+        })
+    }
 
     const handleArrowClicks = (e) => {
         if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
@@ -175,7 +172,9 @@ export default function CardCarousel() {
                             <div 
                             className='flex items-center justify-center m-auto scrollbar-hide h-full'
                             >
-                                {displayFlashcards()}
+                                {showSaved ? 
+                                displaySavedFlashcards() : displayFlashcards()
+                                }
                             </div>
                         </div>
                     </div>
@@ -193,7 +192,9 @@ export default function CardCarousel() {
                 onChange={(e) => handleFlashcardQuery(e.target.value)}
                 className='border-none outline-none w-2 text-blue-500'
                 />
-                {" "} / {sets[currentSetPointer].flashcards.length}
+                {" "} / {showSaved ? 
+                savedFlashcards.length : 
+                sets[currentSetPointer].flashcards.length}
             </div>
             </>
     )

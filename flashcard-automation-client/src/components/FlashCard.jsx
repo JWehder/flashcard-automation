@@ -1,15 +1,41 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { CSSTransition } from "react-transition-group";
 import Star from "../icons/star";
-import { useContext } from "react";
-import { Context } from "../Context";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { Context, endpoint } from "../Context";
 
 // eslint-disable-next-line react/prop-types
-export default function Flashcard({ definition, term, index }) {
+export default function Flashcard({ saved, id, definition, term }) {
     const { 
-        setSaved, 
-        saved } = useContext(Context);
+        currentSetPointer, 
+        sets } = useContext(Context)
+
+    const queryClient = useQueryClient();
+
     const [showFront, setShowFront] = useState(true);
+    
+    const savedMutation = useMutation({
+        mutationFn: (id) => axios.patch(`${endpoint}/saved_flashcards/${id}`),
+        onSuccess: () => {
+            queryClient.setQueryData(['sets'], oldSets => {
+                return oldSets.map(set => {
+                    if (set.id === sets[currentSetPointer].id) {
+                        // Update the specific flashcard in the set
+                        const updatedFlashcards = set.flashcards.map(card => 
+                            card.id === id ? { ...card, saved: !card.saved } : card
+                        );
+                        return { ...set, flashcards: updatedFlashcards };
+                    }
+                    return set; 
+                });
+            });
+        },
+        onError: (resp) => {
+            const error = resp.response.data
+            console.log(error)
+        }
+    })
 
     const handleArrowClicks = (e) => {
         if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
@@ -17,8 +43,9 @@ export default function Flashcard({ definition, term, index }) {
         }
     }
 
-    const save = () => {
-        setSaved([...saved, index])
+    const save = (e) => {
+        e.stopPropagation();
+        savedMutation.mutate(id);
     }
 
     return (
@@ -34,8 +61,8 @@ export default function Flashcard({ definition, term, index }) {
                     <div className="w-full border-2 h-full rounded-lg relative card" onClick={() => {
                         setShowFront((v) => !v);
                     }}>
-                        <div className="justify-left p-5">
-                            <Star onClick={save} saved />
+                        <div className="justify-left p-5" onClick={(e) => save(e)}>
+                            <Star saved={saved} />
                         </div>
                         <div id="card-front" className="p-10 h-full w-full flex justify-center align-center absolute card-front"> 
                             {definition}
@@ -47,6 +74,5 @@ export default function Flashcard({ definition, term, index }) {
                 </CSSTransition>
             </div>
         </>
-
     )
 }
