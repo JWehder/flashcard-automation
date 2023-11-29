@@ -15,7 +15,8 @@ export default function CardCarousel() {
     const scrollContainer = useRef(null);
     const [queryVal, setQueryVal] = useState(1);
     const [wheelThreshold, setWheelThreshold] = useState(0);
-    const inputRef = useRef(null)
+    const [boundary, setBoundary] = useState([]);
+    const inputRef = useRef(null);
 
     useEffect(() => {
         if (showSaved) {
@@ -23,6 +24,17 @@ export default function CardCarousel() {
         }
 
     }, [showSaved])
+
+    useEffect(() => {
+        const flashcardsLen = sets[currentSetPointer].flashcards.length
+
+        if (flashcardsLen < 10) {
+            setBoundary([...Array(flashcardsLen).keys()]);
+        } else {
+            setBoundary([...Array(10).keys()]);
+        }
+
+    }, [sets, currentSetPointer])
 
     if (!sets) {
         return <div>Loading flashcards...</div>
@@ -47,19 +59,77 @@ export default function CardCarousel() {
 
     }
 
-    const createBoundary = () => {
-        // our boundary array of indices
-        let boundary = []
-        // set outer boundaries
-        const firstIndex = 0;
-        const lastIndex = sets[currentSetPointer].flashcards.length - 1;
-        // set the tmpQueryVal
-        let tmpQueryVal = parseInt(queryVal)
+    const createBoundary = (val) => {
 
-        // check if the value is zero
-        if (tmpQueryVal - 1 === 0) {
+        // flashcards
+        const flashcards = sets[currentSetPointer].flashcards
 
+        // flashcard length 
+        const flashcardsLen = flashcards.length;
+
+        // bool check if the value is already within the current boundary
+        const foundQueryVal = boundary.find((num) => num === val-1);
+
+        // no need for change if already in correct boundary
+        // no need for a boundary change if the boundary is less than 10
+        if (foundQueryVal || flashcardsLen < 10) {
+            return;
         }
+
+        // the local tmpBoundary for access around the rest of the func
+        let tmpBoundary = [];
+
+        // check if the value is zero or the last index in the flashcards array
+        if (val - 1 === 0) {
+            setBoundary([...Array(10).keys()]);
+        } else if (val === flashcardsLen) {
+            let counter = 10;
+            while (counter > 0) {
+                counter--;
+                tmpBoundary.push(flashcardsLen - counter);
+            }
+        }
+        
+        if (flashcards[val - 4] && flashcards[val + 4]) {
+            let counter = 4;
+            while (counter >= 0) {
+                tmpBoundary.push(val - counter);
+                counter--;
+            }
+            counter = 1;
+            while (counter <= 4) {
+                tmpBoundary.push(val + counter);
+                counter++;
+            }
+            setBoundary(tmpBoundary);
+        } else {
+            let prefixDiff = val - 0;
+            let postfixDiff = (flashcardsLen - 1) - val;
+            if (prefixDiff > postfixDiff) {
+                let counter = 4;
+                while (counter >= 0) {
+                    tmpBoundary.push(val - counter);
+                    counter--;
+                }
+                counter = 1;
+                while (counter <= postfixDiff) {
+                    tmpBoundary.push(val + counter);
+                }
+            } else {
+                let counter = prefixDiff;
+                while (counter >= 0) {
+                    tmpBoundary.push(val - counter);
+                    counter--;
+                }
+                counter = 4;
+                while (counter <= 4) {
+                    tmpBoundary.push(val + counter);
+                    counter++;
+                }
+            }
+            setBoundary(tmpBoundary);
+        }
+        flipThroughCards(tmpBoundary[0], val);
 
     }
 
