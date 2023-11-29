@@ -52,7 +52,7 @@ export default function Title() {
     return (
         <>
             <div 
-            className="flex my-2 mt-4 justify-center"
+            className="flex my-2 mt-6 justify-center"
             onBlur={handleBlur}
             >
                 <input 

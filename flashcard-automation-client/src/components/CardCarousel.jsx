@@ -1,4 +1,4 @@
-import { useRef, useContext, useState, useEffect } from 'react'
+import { useRef, useContext, useState } from 'react'
 import Flashcard from './FlashCard'
 import { Context } from '../Context'
 import BackButton from '../icons/backbutton';
@@ -12,23 +12,9 @@ export default function CardCarousel() {
         savedFlashcards } = useContext(Context)
 
     const scrollContainer = useRef(null);
-    const [queryVal, setQueryVal] = useState('1');
+    const [queryVal, setQueryVal] = useState(1);
     const [wheelThreshold, setWheelThreshold] = useState(0);
     const inputRef = useRef(null)
-
-    useEffect(() => {
-
-        // Function to update the width of the input
-        const updateInputWidth = () => {
-            const minWidth = 10; // Minimum width in pixels
-            const charWidth = 10; // Average width per character in pixels
-            const newWidth = Math.max(queryVal.length * charWidth, minWidth);
-            inputRef.current.style.width = `${newWidth}px`;
-        };
-
-        // Update the width on render and value change
-        updateInputWidth();
-    }, [queryVal]);
 
     if (!sets) {
         return <div>Loading flashcards...</div>
@@ -60,8 +46,9 @@ export default function CardCarousel() {
         if (prevVal < newVal) {
             // shift the scroll container over until the previous value meets 
             // the requested value
-            while (tmpPrevVal < newVal) {
+            while (tmpPrevVal <= newVal) {
                 // essentially clicking the back arrow for you
+                console.log(tmpPrevVal);
                 shiftScrollContainer("forward");
                 tmpPrevVal++;
             }
@@ -70,7 +57,6 @@ export default function CardCarousel() {
             // the requested value
             while (tmpPrevVal > newVal) {
                 // essentially clicking through the cards for you
-                console.log(tmpPrevVal);
                 shiftScrollContainer("back");
                 tmpPrevVal--;
             }
@@ -165,53 +151,57 @@ export default function CardCarousel() {
 
     return (
             <>
-            <div 
-            className='flex justify-center items-center w-full h-full'>
-                { sets[currentSetPointer].flashcards.length > 0 ?
-                <>
                 <div 
-                className='flex justify-center items-center mt-8 w-[585px] scrollbar-hide'
-                onKeyDown={(e) => handleArrowClicks(e)}
-                tabIndex={0}
-                >
-                    <BackButton handleBackClick={handleBackClick} />
+                className='flex justify-center items-center align-center'>
+                    <div className='justify-center w-8'>
+                        <BackButton handleBackClick={handleBackClick} />
+                    </div>
+                    { sets[currentSetPointer].flashcards.length > 0 ?
+                    <>
                     <div 
-                    className='flex overflow-x-auto items-center justify-center scrollbar-hide h-[400px]'
+                    className='flex justify-center items-center mt-3 w-[525px] scrollbar-hide'
+                    onKeyDown={(e) => handleArrowClicks(e)}
+                    tabIndex={0}
                     >
-
                         <div 
-                        className='flex flex-nowrap overflow-x-auto h-full overflow-scroll scrollbar-hide' 
-                        ref={scrollContainer}
-                        onWheel={() => handleWheel()}
+                        className='flex overflow-x-auto items-center scrollbar-hide'
                         >
                             <div 
-                            className='flex items-center justify-center m-auto scrollbar-hide h-full'
+                            className='flex flex-nowrap overflow-x-auto overflow-scroll scrollbar-hide w-full h-[350px] align-baseline' 
+                            ref={scrollContainer}
+                            onWheel={() => handleWheel()}
                             >
-                                {showSaved ? 
-                                displaySavedFlashcards() : displayFlashcards()
-                                }
+                                <div 
+                                className='flex items-center justify-center m-auto scrollbar-hide'
+                                >
+                                    {showSaved ? 
+                                    displaySavedFlashcards() : displayFlashcards()
+                                    }
+                                </div>
                             </div>
                         </div>
+                        {/* handle the click to the next flashcard */}
+                        
                     </div>
-                    {/* handle the click to the next flashcard */}
-                    <NextButton handleNextClick={handleNextClick} />
+                    </>
+                    :
+                    <div>Sorry, there are no flashcards to display... Create one!</div>
+                    }
+                    <div className='justify-center w-8'>
+                        <NextButton handleNextClick={handleNextClick} />
+                    </div>
                 </div>
-                </>
-                :
-                <div>Sorry, there are no flashcards to display... Create one!</div>
-                }
-            </div>
-                <div className='mb-8'>
-                <input
-                value={queryVal}
-                ref={inputRef}
-                onChange={(e) => handleFlashcardQuery(e.target.value)}
-                className='border-none outline-none w-[10px] text-blue-500 text-center'
-                />
-                 / {showSaved ? 
-                savedFlashcards.length : 
-                sets[currentSetPointer].flashcards.length}
-            </div>
+                <div>
+                    <input
+                    value={queryVal}
+                    ref={inputRef}
+                    onChange={(e) => handleFlashcardQuery(e.target.value)}
+                    className='border-none outline-none text-blue-500 text-center mr-1 w-3'
+                    />
+                    / {showSaved ? 
+                    savedFlashcards.length : 
+                    sets[currentSetPointer].flashcards.length}
+                </div>
             </>
     )
 }

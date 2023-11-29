@@ -64,10 +64,10 @@ export default function Flashcard({ saved, id, definition, term }) {
                         <div className="justify-left p-5" onClick={(e) => save(e)}>
                             <Star saved={saved} />
                         </div>
-                        <div id="card-front" className="p-10 h-full w-full flex justify-center align-center absolute card-front"> 
+                        <div id="card-front" className="p-10 w-full flex justify-center align-center absolute card-front"> 
                             {definition}
                         </div>
-                        <div id="card-back" className="p-10 h-full w-full flex justify-center align-center absolute card-back">
+                        <div id="card-back" className="p-10 w-full flex justify-center align-center absolute card-back">
                             {term}
                         </div>
                     </div>
