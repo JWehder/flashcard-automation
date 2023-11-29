@@ -3,6 +3,7 @@ import Flashcard from './FlashCard'
 import { Context } from '../Context'
 import BackButton from '../icons/backbutton';
 import NextButton from '../icons/nextButton';
+import { useEffect } from 'react';
 
 export default function CardCarousel() {
     const { 
@@ -15,6 +16,13 @@ export default function CardCarousel() {
     const [queryVal, setQueryVal] = useState(1);
     const [wheelThreshold, setWheelThreshold] = useState(0);
     const inputRef = useRef(null)
+
+    useEffect(() => {
+        if (showSaved) {
+            setQueryVal('1');
+        }
+
+    }, [showSaved])
 
     if (!sets) {
         return <div>Loading flashcards...</div>
@@ -39,16 +47,38 @@ export default function CardCarousel() {
 
     }
 
+    const createBoundary = () => {
+        // our boundary array of indices
+        let boundary = []
+        // set outer boundaries
+        const firstIndex = 0;
+        const lastIndex = sets[currentSetPointer].flashcards.length - 1;
+        // set the tmpQueryVal
+        let tmpQueryVal = parseInt(queryVal)
+
+        // check if the value is zero
+        if (tmpQueryVal - 1 === 0) {
+
+        }
+
+    }
+
     // creating another function to actually handle the action of flipping 
     // through the cards
-    const flipThroughCards = (prevVal, newVal) => {
+    const flipThroughCards = async (prevVal, newVal) => {
+        // value with the ability to be rapidly incremented and decremented
         let tmpPrevVal = prevVal
+
+        // method giving the browser enough time to react to the rapid change 
+        // in styling
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
         if (prevVal < newVal) {
             // shift the scroll container over until the previous value meets 
             // the requested value
             while (tmpPrevVal <= newVal) {
+                await delay(1000);
                 // essentially clicking the back arrow for you
-                console.log(tmpPrevVal);
                 shiftScrollContainer("forward");
                 tmpPrevVal++;
             }
@@ -56,6 +86,7 @@ export default function CardCarousel() {
             // shift the scroll container over until the previous value meets 
             // the requested value
             while (tmpPrevVal > newVal) {
+                await delay(1000);
                 // essentially clicking through the cards for you
                 shiftScrollContainer("back");
                 tmpPrevVal--;
