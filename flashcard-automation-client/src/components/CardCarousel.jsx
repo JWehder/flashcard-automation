@@ -27,7 +27,16 @@ export default function CardCarousel() {
 
     useEffect(() => {
         if (sets) {
-            const flashcardsLen = sets[currentSetPointer].flashcards.length
+            const flashcards = showSaved ?
+            savedFlashcards : sets[currentSetPointer].flashcards
+
+            const flashcardsLen = flashcards.length
+
+            if (flashcardsLen === 1) {
+                setBoundary([0]);
+                return;
+            }
+
 
             if (flashcardsLen < 10) {
                 setBoundary([...Array(flashcardsLen).keys()]);
@@ -37,7 +46,7 @@ export default function CardCarousel() {
         }
 
 
-    }, [sets, currentSetPointer])
+    }, [sets, currentSetPointer, showSaved, savedFlashcards])
 
     if (!sets) {
         return <div>Loading flashcards...</div>
@@ -65,9 +74,11 @@ export default function CardCarousel() {
         } 
 
         if (foundQueryVal) {
+            setQueryVal(val);
             // flip through cards until we get to the requested card
             flipThroughCards(queryVal, intVal);
         } else {
+            setQueryVal(val);
             createBoundary(intVal);
         }
 
@@ -76,7 +87,8 @@ export default function CardCarousel() {
     const createBoundary = (val) => {
 
         // flashcards
-        const flashcards = sets[currentSetPointer].flashcards
+        const flashcards = showSaved ? 
+        savedFlashcards : sets[currentSetPointer].flashcards
 
         // flashcard length 
         const flashcardsLen = flashcards.length;
@@ -85,6 +97,10 @@ export default function CardCarousel() {
         // no need for a boundary change if the boundary is less than 10
         if (flashcardsLen < 10 || val === 0 || val > flashcardsLen) {
             return;
+        }
+
+        if (flashcardsLen === 1) {
+            return [0]
         }
 
         // the local tmpBoundary for access around the rest of the func
@@ -141,6 +157,7 @@ export default function CardCarousel() {
         }
 
         flipThroughCards(Math.floor(tmpBoundary.length / 2), val);
+        return tmpBoundary;
     }
 
     // creating another function to actually handle the action of flipping 
@@ -157,6 +174,7 @@ export default function CardCarousel() {
             // shift the scroll container over until the previous value meets 
             // the requested value
             while (tmpPrevVal <= newVal) {
+                // give the browser time to react
                 await delay(1000);
                 // essentially clicking the back arrow for you
                 shiftScrollContainer("forward");
@@ -166,13 +184,13 @@ export default function CardCarousel() {
             // shift the scroll container over until the previous value meets 
             // the requested value
             while (tmpPrevVal > newVal) {
+                // give the browser time to react
                 await delay(1000);
                 // essentially clicking through the cards for you
                 shiftScrollContainer("back");
                 tmpPrevVal--;
             }
         }
-        setQueryVal(newVal);
     }
 
     const shiftScrollContainer = (direction) => {
@@ -196,11 +214,18 @@ export default function CardCarousel() {
             shiftScrollContainer("back");
         }
 
-        const foundValue = boundary.find((num) => num === tmpVal - 3);
+        // how do we determine when to change the boundary
+        // the value is one away from the edge and there is an index available in flashcards
+        // find if it is almost at the edge
+        // how do we get the index: find(val, idx)
+        // [5, 6, 7, 8, 9, 10] 
+        //     ^
+        //  0, 1, 2, 3, 4, 5
+        // tmpVal is 6, meaning it is the sixth index in flashcards but it is the 1 element in boundary
+        // first determine where the index is in boundary, check if it is one away from zero. IF it is, move it on to the next process
+        // the next process is determining is the current query value - 2 available in the current iteration of flashcards
 
-        if (!foundValue) {
-            createBoundary(tmpVal - 1);
-        }   
+
     }
 
     const handleNextClick = () => {
@@ -214,10 +239,10 @@ export default function CardCarousel() {
             shiftScrollContainer("forward");
         }
 
-        const foundValue = boundary.find((num) => num === tmpVal + 3);
+        // how do we determine where to insert the boundary
 
         if (!foundValue) {
-            createBoundary(tmpVal + 1);
+            setBoundary(createBoundary(tmpVal + 1));
         }   
     }
 
@@ -239,7 +264,10 @@ export default function CardCarousel() {
     }
 
     const displayFlashcards = () => {
-        return sets[currentSetPointer].flashcards.map((card) => {
+        const set = sets[currentSetPointer]
+        return boundary.map((index) => {
+            console.log("flashcard:", index)
+            const card = set.flashcards[index]
             return (
                 <Flashcard 
                 key={`card-${card.id}`} 
@@ -253,7 +281,8 @@ export default function CardCarousel() {
     }
 
     const displaySavedFlashcards = () => {
-        return savedFlashcards.map((card) => {
+        return boundary.map((index) => {
+            const card = savedFlashcards[index];
             return (
                 <Flashcard 
                 key={`card-${card.id}`} 

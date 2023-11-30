@@ -73,7 +73,6 @@ function ContextProvider({ children }) {
         }
     }, [sets, currentSetPointer])
     
-
     const changeSet = (name) => {
         const selectedSet = sets.find((set) => set.name === name)
         if (selectedSet) {
