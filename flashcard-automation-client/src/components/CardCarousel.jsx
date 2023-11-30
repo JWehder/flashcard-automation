@@ -26,13 +26,16 @@ export default function CardCarousel() {
     }, [showSaved])
 
     useEffect(() => {
-        const flashcardsLen = sets[currentSetPointer].flashcards.length
+        if (sets) {
+            const flashcardsLen = sets[currentSetPointer].flashcards.length
 
-        if (flashcardsLen < 10) {
-            setBoundary([...Array(flashcardsLen).keys()]);
-        } else {
-            setBoundary([...Array(10).keys()]);
+            if (flashcardsLen < 10) {
+                setBoundary([...Array(flashcardsLen).keys()]);
+            } else {
+                setBoundary([...Array(10).keys()]);
+            }
         }
+
 
     }, [sets, currentSetPointer])
 
@@ -41,21 +44,32 @@ export default function CardCarousel() {
     }
 
     const handleFlashcardQuery = (val) => {
+        // convert the val to an integer
+        const intVal = parseInt(val);
+
+        // flashcards 
+        const flashcards = sets[currentSetPointer].flashcards
+
+        // bool check if the value is already within the current boundary
+        const foundQueryVal = boundary.find((num) => num === val-1);
+
         // handle the edge case for an undefined value or backspace
         if (!val) {
             setQueryVal(queryVal);
             return;
         }
 
-        const intVal = val
-        if (intVal > sets[currentSetPointer].flashcards.length || intVal <= 0) {
+        if (intVal > flashcards.length || intVal <= 0) {
             setQueryVal("1");
             return;
         } 
-        // the value represented within the input box
-        setQueryVal(intVal);
-        // flip through cards until we get to the requested card
-        flipThroughCards(queryVal, intVal);
+
+        if (foundQueryVal) {
+            // flip through cards until we get to the requested card
+            flipThroughCards(queryVal, intVal);
+        } else {
+            createBoundary(intVal);
+        }
 
     }
 
@@ -67,12 +81,9 @@ export default function CardCarousel() {
         // flashcard length 
         const flashcardsLen = flashcards.length;
 
-        // bool check if the value is already within the current boundary
-        const foundQueryVal = boundary.find((num) => num === val-1);
-
         // no need for change if already in correct boundary
         // no need for a boundary change if the boundary is less than 10
-        if (foundQueryVal || flashcardsLen < 10) {
+        if (flashcardsLen < 10 || val === 0 || val > flashcardsLen) {
             return;
         }
 
@@ -81,12 +92,12 @@ export default function CardCarousel() {
 
         // check if the value is zero or the last index in the flashcards array
         if (val - 1 === 0) {
-            setBoundary([...Array(10).keys()]);
+            tmpBoundary = [...Array(10).keys()];
         } else if (val === flashcardsLen) {
             let counter = 10;
             while (counter > 0) {
-                counter--;
                 tmpBoundary.push(flashcardsLen - counter);
+                counter--;
             }
         }
         
@@ -97,12 +108,11 @@ export default function CardCarousel() {
                 counter--;
             }
             counter = 1;
-            while (counter <= 4) {
+            while (counter <= 5) {
                 tmpBoundary.push(val + counter);
                 counter++;
             }
-            setBoundary(tmpBoundary);
-        } else {
+        } else if ((val - 1) !== 0 && val !== flashcardsLen) {
             let prefixDiff = val - 0;
             let postfixDiff = (flashcardsLen - 1) - val;
             if (prefixDiff > postfixDiff) {
@@ -114,6 +124,7 @@ export default function CardCarousel() {
                 counter = 1;
                 while (counter <= postfixDiff) {
                     tmpBoundary.push(val + counter);
+                    counter++;
                 }
             } else {
                 let counter = prefixDiff;
@@ -121,16 +132,15 @@ export default function CardCarousel() {
                     tmpBoundary.push(val - counter);
                     counter--;
                 }
-                counter = 4;
-                while (counter <= 4) {
+                counter = 1;
+                while (counter <= 5) {
                     tmpBoundary.push(val + counter);
                     counter++;
                 }
             }
-            setBoundary(tmpBoundary);
         }
-        flipThroughCards(tmpBoundary[0], val);
 
+        flipThroughCards(Math.floor(tmpBoundary.length / 2), val);
     }
 
     // creating another function to actually handle the action of flipping 
