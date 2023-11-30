@@ -195,6 +195,12 @@ export default function CardCarousel() {
             setQueryVal(tmpVal - 1);
             shiftScrollContainer("back");
         }
+
+        const foundValue = boundary.find((num) => num === tmpVal - 3);
+
+        if (!foundValue) {
+            createBoundary(tmpVal - 1);
+        }   
     }
 
     const handleNextClick = () => {
@@ -205,8 +211,14 @@ export default function CardCarousel() {
            
         if (sets[currentSetPointer].flashcards[queryVal]) {
             setQueryVal(tmpVal + 1);
+            shiftScrollContainer("forward");
         }
-        shiftScrollContainer("forward");
+
+        const foundValue = boundary.find((num) => num === tmpVal + 3);
+
+        if (!foundValue) {
+            createBoundary(tmpVal + 1);
+        }   
     }
 
     const handleWheel = () => {
