@@ -17,12 +17,31 @@ export default function CardCarousel() {
     const [wheelThreshold, setWheelThreshold] = useState(0);
     const [boundary, setBoundary] = useState([]);
     const [currentBoundaryIdx, setCurrentBoundaryIdx] = useState(0);
+    const [loadingNewBoundary, setLoadingNewBoundary] = useState(false);
 
     const inputRef = useRef(null);
 
-    // method giving the browser enough time to react to the rapid change 
-    // in styling
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    // Looking if new boundary was loaded
+    // the most it should run is twice. It should cleanup itself
+    useEffect(() => {
+        if (boundary.length > 0 && loadingNewBoundary) {
+            // parse the integer in case the value is not an integer
+            const intVal = parseInt(queryVal);
+
+            // where is the current value in boundary? What's the index?
+            const queryIdx = boundary.findIndex((val) => val === intVal-1);
+
+            // flip through to the correct card
+            flipThroughCards(currentBoundaryIdx, queryIdx);
+            // set the new boundary index
+            setCurrentBoundaryIdx(queryIdx);
+            // once changes have been reflected in browser, 
+            // turn off loadingNewBoundary
+            setLoadingNewBoundary(false);
+            
+        }
+
+    }, [loadingNewBoundary])
 
     useEffect(() => {
         if (sets) {
@@ -48,14 +67,13 @@ export default function CardCarousel() {
             }
         }
 
-        console.log("show saved is changed")
-
     }, [sets, currentSetPointer, showSaved])
 
     if (!sets) {
         return <div>Loading flashcards...</div>
     }
 
+    // takes in a queryVal, not an index. It is converted to indices
     const createBoundary = (val) => {
 
         // flashcards
@@ -128,6 +146,10 @@ export default function CardCarousel() {
             }
         }
 
+        // whenever this method is called, it should inform the app
+        // that we are loading a new boundary and there needs to be changes
+        // to the client's browser
+        setLoadingNewBoundary(true);
         return tmpBoundary;
     }
 
@@ -160,13 +182,15 @@ export default function CardCarousel() {
         } else {
             // if the requested value is currently not in the boundary
             setQueryVal(val);
-            // create a new boundary where the value is included in it
-            setBoundary(createBoundary(intVal));
             // start at the first value of the new boundary, till you get to 
             // the query value
             setCurrentBoundaryIdx(0);
+            // set the new boundary
+            // create a new boundary where the value is included in it
+            setBoundary(createBoundary(intVal));
+            // set loading new boundary to true, to run useEffect
+            setLoadingNewBoundary(true);
         }
-
     }
     // [0, 1, 2, 3, 4, [5, 6, 7, 8, 9, 10, 11, 12], 13, 14, 15, 16, 17, 18]
     //                              ^
@@ -174,66 +198,64 @@ export default function CardCarousel() {
     // not sure wherever the starting point will ever be.
     // best to reduce the chances of a bug by going to the first value in the list and shifting cards till you get to the right place
 
-
-
-
     // creating another function to actually handle the action of flipping 
     // through the cards
     const flipThroughCards = async (prevVal, newVal) => {
-        // value with the ability to be rapidly incremented and decremented
-        let tmpPrevVal = prevVal
 
         if (prevVal < newVal) {
             // shift the scroll container over until the previous value meets 
             // the requested value
-            while (tmpPrevVal <= newVal) {
-                // give the browser time to react
-                await delay(500);
-                // essentially clicking the back arrow for you
-                shiftScrollContainer("forward", currentBoundaryIdx + 1);
-                tmpPrevVal++;
-            }
+            shiftScrollContainer("forward", newVal);
         } else if (prevVal > newVal) {
             // shift the scroll container over until the previous value meets 
             // the requested value
-            while (tmpPrevVal > newVal) {
-                // give the browser time to react
-                await delay(500);
-                // essentially clicking through the cards for you
-                shiftScrollContainer("back", currentBoundaryIdx - 1);
-                tmpPrevVal--;
-            }
+            shiftScrollContainer("back", newVal)
         }
+    }
+
+    const inFlashcards = (val) => {
+        // determine which flashcards we'll be searching
+        const flashcards = showSaved ?
+        savedFlashcards : sets[currentSetPointer].flashcards;
+
+        return flashcards[val];
+    }
+
+    const atTheEdge = () => {
+        // get the second to last value in boundary
+        const secondToLast = boundary[-2];
+
+        // determine which edge the value is
+        if (currentBoundaryIdx === 1) {
+            return 1;
+        } else if (currentBoundaryIdx === secondToLast) {
+            return -1;
+        } else {
+            return null;
+        }
+
     }
 
     // bool test to see if boundary needs to be expanded
     const expandBoundary = () => {
-        const flashcards = showSaved ?
-        savedFlashcards : sets[currentSetPointer].flashcards;
-        // how do we determine when to change the boundary
-        // the value is one away from the edge and there is an index available in flashcards
-        // find if it is almost at the edge
-        // how do we get the index: find(val, idx)
-        // [5, 6, 7, 8, 9, 10] 
-        //     ^
-        //  0, 1, 2, 3, 4, 5
-        // tmpVal is 6, meaning it is the sixth index in flashcards but it is the 1 element in boundary
-        // first determine where the index is in boundary, check if it is one away from zero. IF it is, move it on to the next process
-        // the next process is determining is the current query value - 2 available in the current iteration of flashcards
+        const edge = atTheEdge();
 
-        // if its at the end of the boundary and there is available real 
-        // estate to grow, change the boundary
-        return inFlashcards;
-    }
+        let inFlashcardsBool = false;
 
-    const atTheEdge = () => {
+        // is it at the edge of the boundary?
+        if (edge === 1) {
+            // if it's at the front edge, determine if the values behind it 
+            // are in the flashcard
+            inFlashcardsBool = inFlashcards(boundary[currentBoundaryIdx] - 2);
+        } else if (edge === -1) {
+            // if the value is at the back edge, determine if the values in 
+            // front of it are available
+            inFlashcardsBool = inFlashcards(boundary[currentBoundaryIdx] + 2);
+        } else {
+            return;
+        }
 
-        // find the index of the value within boundary
-        const queryValIdx = boundary.findIndex((val) => 
-        val === (queryVal - 1));
-
-        // is the index of the current queryVal at the edge of the boundary
-        return queryValIdx === 1 || boundary[boundary.length - 2];
+        return inFlashcardsBool;
     }
 
     const shiftScrollContainer = (direction, tmpVal) => {
@@ -242,16 +264,10 @@ export default function CardCarousel() {
 
         let newScrollLeft;
 
-        console.log(container.scrollLeft)
-
         if (direction === "back") {
-            if (tmpVal === 0) {
-                newScrollLeft = 0;
-            } else {
-                newScrollLeft = 530 * tmpVal
-            }
+            newScrollLeft = 532 * tmpVal
         } else if (direction === "forward") {
-            newScrollLeft = 530 * tmpVal
+            newScrollLeft = 532 * tmpVal;
         }
 
         container.style.scrollBehavior = 'smooth';
@@ -272,9 +288,9 @@ export default function CardCarousel() {
             shiftScrollContainer("back", tmpBoundaryIdx);
         }
 
-        // if (atTheEdge()) {    
-
-        // }   
+        if (expandBoundary()) {
+            setBoundary(createBoundary());
+        }
 
     }
 
@@ -289,6 +305,10 @@ export default function CardCarousel() {
             setQueryVal(tmpVal + 1);
             setCurrentBoundaryIdx(tmpBoundaryIdx);
             shiftScrollContainer("forward", tmpBoundaryIdx);
+        }
+
+        if (expandBoundary()) {
+            setBoundary(createBoundary)
         }
     }
 
