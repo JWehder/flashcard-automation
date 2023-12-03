@@ -14,7 +14,7 @@ export default function CardCarousel() {
 
     const scrollContainer = useRef(null);
     const [queryVal, setQueryVal] = useState(1);
-    const [wheelThreshold, setWheelThreshold] = useState(0);
+    const [wheelThreshold, setWheelThreshold] = useState(325);
     const [boundary, setBoundary] = useState([]);
     const [currentBoundaryIdx, setCurrentBoundaryIdx] = useState(0);
     const [loadingNewBoundary, setLoadingNewBoundary] = useState(false);
@@ -291,8 +291,8 @@ export default function CardCarousel() {
         if (tmpVal !== 0 && (tmpVal - 1) !== 0) {
             setQueryVal(tmpVal - 1);
             setCurrentBoundaryIdx(tmpBoundaryIdx);
+            setWheelThreshold(wheelThreshold - 400);
             if (expandBoundary(tmpBoundaryIdx)) {
-                console.log("back");
                 setBoundary(createBoundary());
                 setLoadingNewBoundary(true);
                 return;
@@ -312,6 +312,7 @@ export default function CardCarousel() {
         if (sets[currentSetPointer].flashcards[queryVal]) {
             setQueryVal(tmpVal + 1);
             setCurrentBoundaryIdx(tmpBoundaryIdx);
+            setWheelThreshold(wheelThreshold + 400);
             if (expandBoundary(tmpBoundaryIdx)) {
                 console.log("forward");
                 setBoundary(createBoundary());
@@ -325,15 +326,30 @@ export default function CardCarousel() {
 
     const handleWheel = () => {
         let tmpVal = parseInt(queryVal);
-        if (scrollContainer.current.scrollLeft > (wheelThreshold + 325)) {
-            setWheelThreshold(wheelThreshold + 325);
+
+        const container = scrollContainer.current
+
+        console.log(container.scrollLeft);
+
+        if (container.scrollLeft === 400) {
+            console.log(container.scrollLeft, wheelThreshold);
+            console.log(container.scrollLeft % 300)
+            return;
+        }
+        
+
+        if (container.scrollLeft > (wheelThreshold + 400)) {
+            setWheelThreshold(wheelThreshold + 400);
+            console.log(wheelThreshold);
             if (sets[currentSetPointer].flashcards[tmpVal]) {
                 setQueryVal(tmpVal + 1);
+                setCurrentBoundaryIdx(currentBoundaryIdx + 1);
             }
-        } else if (scrollContainer.current.scrollLeft <= (wheelThreshold - 325)) {
-            setWheelThreshold(wheelThreshold - 325);
+        } else if (container.scrollLeft <= (wheelThreshold - 400)) {
+            setWheelThreshold(wheelThreshold - 400);
             if (tmpVal - 1 !== 0) {
                 setQueryVal(tmpVal - 1);
+                setCurrentBoundaryIdx(currentBoundaryIdx - 1);
             }
         } else {
             return;
