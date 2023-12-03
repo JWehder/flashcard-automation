@@ -21,10 +21,18 @@ export default function CardCarousel() {
 
     const inputRef = useRef(null);
 
+    useEffect(() => {
+        console.log("boundary");
+        console.log(boundary);
+    }, [boundary])
+
     // Looking if new boundary was loaded
     // the most it should run is twice. It should cleanup itself
     useEffect(() => {
+        console.log("hitting me?")
         if (boundary.length > 0 && loadingNewBoundary) {
+            console.log("I've been hit!")
+
             // parse the integer in case the value is not an integer
             const intVal = parseInt(queryVal);
 
@@ -221,14 +229,14 @@ export default function CardCarousel() {
         return flashcards[val];
     }
 
-    const atTheEdge = () => {
+    const atTheEdge = (tmpBoundaryIdx) => {
         // get the second to last value in boundary
-        const secondToLast = boundary[-2];
+        const secondToLast = boundary[boundary.length - 2];
 
         // determine which edge the value is
-        if (currentBoundaryIdx === 1) {
+        if (tmpBoundaryIdx === 1 && boundary[tmpBoundaryIdx] !== 1) {
             return 1;
-        } else if (currentBoundaryIdx === secondToLast) {
+        } else if (boundary[tmpBoundaryIdx] === secondToLast) {
             return -1;
         } else {
             return null;
@@ -237,8 +245,8 @@ export default function CardCarousel() {
     }
 
     // bool test to see if boundary needs to be expanded
-    const expandBoundary = () => {
-        const edge = atTheEdge();
+    const expandBoundary = (tmpBoundaryIdx) => {
+        const edge = atTheEdge(tmpBoundaryIdx);
 
         let inFlashcardsBool = false;
 
@@ -246,13 +254,11 @@ export default function CardCarousel() {
         if (edge === 1) {
             // if it's at the front edge, determine if the values behind it 
             // are in the flashcard
-            inFlashcardsBool = inFlashcards(boundary[currentBoundaryIdx] - 2);
+            inFlashcardsBool = inFlashcards(boundary[tmpBoundaryIdx] - 2);
         } else if (edge === -1) {
             // if the value is at the back edge, determine if the values in 
             // front of it are available
-            inFlashcardsBool = inFlashcards(boundary[currentBoundaryIdx] + 2);
-        } else {
-            return;
+            inFlashcardsBool = inFlashcards(boundary[tmpBoundaryIdx] + 2);
         }
 
         return inFlashcardsBool;
@@ -285,11 +291,13 @@ export default function CardCarousel() {
         if (tmpVal !== 0 && (tmpVal - 1) !== 0) {
             setQueryVal(tmpVal - 1);
             setCurrentBoundaryIdx(tmpBoundaryIdx);
+            if (expandBoundary(tmpBoundaryIdx)) {
+                console.log("back");
+                setBoundary(createBoundary());
+                setLoadingNewBoundary(true);
+                return;
+            }
             shiftScrollContainer("back", tmpBoundaryIdx);
-        }
-
-        if (expandBoundary()) {
-            setBoundary(createBoundary());
         }
 
     }
@@ -304,12 +312,15 @@ export default function CardCarousel() {
         if (sets[currentSetPointer].flashcards[queryVal]) {
             setQueryVal(tmpVal + 1);
             setCurrentBoundaryIdx(tmpBoundaryIdx);
+            if (expandBoundary(tmpBoundaryIdx)) {
+                console.log("forward");
+                setBoundary(createBoundary());
+                setLoadingNewBoundary(true);
+                return;
+            }
             shiftScrollContainer("forward", tmpBoundaryIdx);
         }
 
-        if (expandBoundary()) {
-            setBoundary(createBoundary)
-        }
     }
 
     const handleWheel = () => {
