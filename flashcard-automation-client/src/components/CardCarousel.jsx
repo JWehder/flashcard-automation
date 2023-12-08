@@ -31,7 +31,6 @@ export default function CardCarousel() {
     useEffect(() => {
         console.log("hitting me?")
         if (boundary.length > 0 && loadingNewBoundary) {
-            console.log("I've been hit!")
 
             // parse the integer in case the value is not an integer
             const intVal = parseInt(queryVal);
@@ -245,7 +244,7 @@ export default function CardCarousel() {
     }
 
     // bool test to see if boundary needs to be expanded
-    const expandBoundary = (tmpBoundaryIdx) => {
+    const shouldExpand = (tmpBoundaryIdx) => {
         const edge = atTheEdge(tmpBoundaryIdx);
 
         let inFlashcardsBool = false;
@@ -262,6 +261,41 @@ export default function CardCarousel() {
         }
 
         return inFlashcardsBool;
+    }
+
+    // actually expand the boundary of either left or right depending on the 
+    // edge value
+    const expandBoundary = (direction) => {
+        // create a count variable to cut off the iteration at a certain point
+        let maxCount = 5;
+
+        // creating a temporary local boundary to avoid multi rerenders
+        const tmpBoundary = [...boundary]
+
+        // conditional to determine the direction
+        if (direction === "back") {
+            // start starts as the first value in boundary
+            let start = boundary[0];
+            // run while there's either an existing value in flashcards or the 
+            // loop has ran 5 times
+            while(sets[currentSetPointer].flashcards[start] && maxCount >= 0) {
+                start--;
+                tmpBoundary.unshift(start);
+                maxCount--;
+            }
+        } else if (direction === "forward") {
+            let end = boundary[boundary.length - 1];
+            // run while there's either an existing value in flashcards or the 
+            // loop has ran 5 times
+            while(sets[currentSetPointer].flashcards[end] && maxCount >= 0) {
+                end++;
+                tmpBoundary.push(end);
+                maxCount--;
+            }
+        }
+
+        setBoundary(tmpBoundary);
+
     }
 
     const shiftScrollContainer = (direction, tmpVal) => {
@@ -292,10 +326,8 @@ export default function CardCarousel() {
             setQueryVal(tmpVal - 1);
             setCurrentBoundaryIdx(tmpBoundaryIdx);
             setWheelThreshold(wheelThreshold - 400);
-            if (expandBoundary(tmpBoundaryIdx)) {
-                setBoundary(createBoundary());
-                setLoadingNewBoundary(true);
-                return;
+            if (shouldExpand(tmpBoundaryIdx)) {
+                expandBoundary("back");
             }
             shiftScrollContainer("back", tmpBoundaryIdx);
         }
@@ -313,11 +345,8 @@ export default function CardCarousel() {
             setQueryVal(tmpVal + 1);
             setCurrentBoundaryIdx(tmpBoundaryIdx);
             setWheelThreshold(wheelThreshold + 400);
-            if (expandBoundary(tmpBoundaryIdx)) {
-                console.log("forward");
-                setBoundary(createBoundary());
-                setLoadingNewBoundary(true);
-                return;
+            if (shouldExpand(tmpBoundaryIdx)) {
+                expandBoundary("forward");
             }
             shiftScrollContainer("forward", tmpBoundaryIdx);
         }
