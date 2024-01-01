@@ -49,8 +49,6 @@ export default function CardCarousel() {
 
     }
 
-    // creating another function to actually handle the action of flipping 
-    // through the cards
     const flipThroughCards = async (prevVal, newVal) => {
 
         if (prevVal < newVal) {
@@ -64,11 +62,16 @@ export default function CardCarousel() {
         }
     }
 
+    // creating another function to actually handle the action of flipping 
+    // through the cards
     const shiftScrollContainer = (direction, tmpVal) => {
         const container = scrollContainer.current;
         if (!container) return;
 
         let newScrollLeft;
+
+        // scrollContainer will land at one above queryrVal otherwise
+        tmpVal = tmpVal - 1;
 
         if (direction === "back") {
             newScrollLeft = 532 * tmpVal
