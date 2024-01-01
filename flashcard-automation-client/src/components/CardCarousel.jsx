@@ -199,11 +199,6 @@ export default function CardCarousel() {
             setLoadingNewBoundary(true);
         }
     }
-    // [0, 1, 2, 3, 4, [5, 6, 7, 8, 9, 10, 11, 12], 13, 14, 15, 16, 17, 18]
-    //                              ^
-    //                         my query val
-    // not sure wherever the starting point will ever be.
-    // best to reduce the chances of a bug by going to the first value in the list and shifting cards till you get to the right place
 
     // creating another function to actually handle the action of flipping 
     // through the cards
@@ -360,13 +355,13 @@ export default function CardCarousel() {
 
         console.log(container.scrollLeft);
 
-        if (container.scrollLeft === 400) {
+        if (350 <= container.scrollLeft <= 400) {
             console.log(container.scrollLeft, wheelThreshold);
             console.log(container.scrollLeft % 300)
             return;
         }
         
-
+        // if the scrollbar has progressed past the wheelThreshold range
         if (container.scrollLeft > (wheelThreshold + 400)) {
             setWheelThreshold(wheelThreshold + 400);
             console.log(wheelThreshold);
@@ -398,7 +393,7 @@ export default function CardCarousel() {
                 saved={card.saved}
                 />
             );
-        })  
+        });  
     }
 
     const displaySavedFlashcards = () => {
