@@ -14,7 +14,7 @@ export default function CardCarousel() {
 
     const scrollContainer = useRef(null);
     const [queryVal, setQueryVal] = useState(1);
-    const [wheelThreshold, setWheelThreshold] = useState(325);
+    const [wheelThreshold, setWheelThreshold] = useState(400);
 
     const inputRef = useRef(null);
 
@@ -36,7 +36,7 @@ export default function CardCarousel() {
         const intVal = parseInt(val);
 
         // current set's flashcards 
-        const flashcards = sets[currentSetPointer].flashcards
+        const flashcards = sets[currentSetPointer].flashcards;
 
         if (!val || intVal > flashcards.length || intVal <= 0) {
             setQueryVal(queryVal);
@@ -58,7 +58,7 @@ export default function CardCarousel() {
         } else if (prevVal > newVal) {
             // shift the scroll container over until the previous value meets 
             // the requested value
-            shiftScrollContainer("back", newVal)
+            shiftScrollContainer("back", newVal);
         }
     }
 
@@ -70,7 +70,8 @@ export default function CardCarousel() {
 
         let newScrollLeft;
 
-        // scrollContainer will land at one above queryrVal otherwise
+        // scrollContainer will land at one more than the queryrVal otherwise
+        // because the initial scrollLeft is at zero
         tmpVal = tmpVal - 1;
 
         if (direction === "back") {
@@ -90,8 +91,11 @@ export default function CardCarousel() {
             tmpVal = parseInt(tmpVal);
         }
 
-        if (tmpVal !== 0 && (tmpVal - 1) !== 0) {
-            setQueryVal(tmpVal - 1);
+        // subtract query value
+        tmpVal--;
+
+        if (tmpVal !== 0) {
+            setQueryVal(tmpVal);
             setWheelThreshold(wheelThreshold - 400);
             shiftScrollContainer("back", tmpVal);
         }
@@ -103,9 +107,12 @@ export default function CardCarousel() {
         if (typeof tmpVal !== "number") {
             tmpVal = parseInt(tmpVal);
         }
+
+        // add to the query value
+        tmpVal++;
            
         if (sets[currentSetPointer].flashcards[queryVal]) {
-            setQueryVal(tmpVal + 1);
+            setQueryVal(tmpVal);
             setWheelThreshold(wheelThreshold + 400);
             shiftScrollContainer("forward", tmpVal);
         }
@@ -119,20 +126,18 @@ export default function CardCarousel() {
 
         console.log(container.scrollLeft);
 
-        if (350 <= container.scrollLeft <= 400) {
-            console.log(container.scrollLeft, wheelThreshold);
-            console.log(container.scrollLeft % 300)
-            return;
-        }
+        console.log(wheelThreshold)
+
+        console.log(container.scrollLeft >= wheelThreshold);
+
+        console.log(queryVal);
         
         // if the scrollbar has progressed past the wheelThreshold range
-        if (container.scrollLeft > (wheelThreshold + 400)) {
+        if (container.scrollLeft >= wheelThreshold) {
             setWheelThreshold(wheelThreshold + 400);
             console.log(wheelThreshold);
-            if (sets[currentSetPointer].flashcards[tmpVal]) {
-                setQueryVal(tmpVal + 1);
-            }
-        } else if (container.scrollLeft <= (wheelThreshold - 400)) {
+            setQueryVal(tmpVal + 1);
+        } else if (container.scrollLeft < (wheelThreshold - 400)) {
             setWheelThreshold(wheelThreshold - 400);
             if (tmpVal - 1 !== 0) {
                 setQueryVal(tmpVal - 1);
