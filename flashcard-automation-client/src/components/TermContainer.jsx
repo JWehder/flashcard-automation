@@ -26,7 +26,9 @@ export default function TermContainer() {
     const displayTerms = () => {
 
         if (sets[currentSetPointer].flashcards.length > 0 && !showSaved) {
-            return sets[currentSetPointer].flashcards.map((flashcard) => <Term key={`flashcard-${flashcard.id}`} id={flashcard.id} term={flashcard.term} definition={flashcard.definition} />);
+            return sets[currentSetPointer].flashcards.map((flashcard) => {
+                
+            }<Term key={`flashcard-${flashcard.id}`} id={flashcard.id} term={flashcard.term} definition={flashcard.definition} />);
         } else if (showSaved) {
             return savedFlashcards.map((flashcard) => {
                 return <Term key={`flashcard-${flashcard.id}`} id={flashcard.id} term={flashcard.term} definition={flashcard.definition} />

@@ -10,11 +10,11 @@ export default function CardCarousel() {
         sets, 
         currentSetPointer, 
         showSaved,
-        savedFlashcards } = useContext(Context)
+        savedFlashcards } = useContext(Context);
 
     const scrollContainer = useRef(null);
     const [queryVal, setQueryVal] = useState(1);
-    const [wheelThreshold, setWheelThreshold] = useState(400);
+    const [wheelThreshold, setWheelThreshold] = useState(500);
 
     const inputRef = useRef(null);
 
@@ -46,6 +46,8 @@ export default function CardCarousel() {
         setQueryVal(val);
         // flip through cards until we get to the requested card
         flipThroughCards(queryVal, intVal);
+        // set the wheel threshold
+        setWheelThreshold(500 * intVal);
 
     }
 
@@ -96,7 +98,7 @@ export default function CardCarousel() {
 
         if (tmpVal !== 0) {
             setQueryVal(tmpVal);
-            setWheelThreshold(wheelThreshold - 400);
+            setWheelThreshold(wheelThreshold - 500);
             shiftScrollContainer("back", tmpVal);
         }
 
@@ -113,7 +115,7 @@ export default function CardCarousel() {
            
         if (sets[currentSetPointer].flashcards[queryVal]) {
             setQueryVal(tmpVal);
-            setWheelThreshold(wheelThreshold + 400);
+            setWheelThreshold(wheelThreshold + 500);
             shiftScrollContainer("forward", tmpVal);
         }
 
@@ -123,22 +125,14 @@ export default function CardCarousel() {
         let tmpVal = parseInt(queryVal);
 
         const container = scrollContainer.current
-
-        console.log(container.scrollLeft);
-
-        console.log(wheelThreshold)
-
-        console.log(container.scrollLeft >= wheelThreshold);
-
-        console.log(queryVal);
         
         // if the scrollbar has progressed past the wheelThreshold range
         if (container.scrollLeft >= wheelThreshold) {
-            setWheelThreshold(wheelThreshold + 400);
+            setWheelThreshold(wheelThreshold + 500);
             console.log(wheelThreshold);
             setQueryVal(tmpVal + 1);
-        } else if (container.scrollLeft < (wheelThreshold - 400)) {
-            setWheelThreshold(wheelThreshold - 400);
+        } else if (container.scrollLeft < (wheelThreshold - 500)) {
+            setWheelThreshold(wheelThreshold - 500);
             if (tmpVal - 1 !== 0) {
                 setQueryVal(tmpVal - 1);
             }
