@@ -24,14 +24,33 @@ export default function TermContainer() {
     const shouldDisplayTerms = !isSetsLoading && sets[currentSetPointer].flashcards.length > 0
 
     const displayTerms = () => {
+        let flashcardNum = 0;
 
         if (sets[currentSetPointer].flashcards.length > 0 && !showSaved) {
             return sets[currentSetPointer].flashcards.map((flashcard) => {
-                
-            }<Term key={`flashcard-${flashcard.id}`} id={flashcard.id} term={flashcard.term} definition={flashcard.definition} />);
+
+                flashcardNum++;
+                return (
+                <Term 
+                key={`flashcard-${flashcard.id}`} 
+                id={flashcard.id} 
+                term={flashcard.term} 
+                definition={flashcard.definition}
+                num={flashcardNum} />
+                )
+            });
         } else if (showSaved) {
             return savedFlashcards.map((flashcard) => {
-                return <Term key={`flashcard-${flashcard.id}`} id={flashcard.id} term={flashcard.term} definition={flashcard.definition} />
+
+                flashcardNum++;
+                return (
+                    <Term 
+                    key={`flashcard-${flashcard.id}`} 
+                    id={flashcard.id} 
+                    term={flashcard.term} 
+                    definition={flashcard.definition}
+                    num={flashcardNum} />
+                )
             })
         } else {
             return [];
