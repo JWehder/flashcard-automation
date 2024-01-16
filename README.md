@@ -26,20 +26,20 @@ export FLASK_APP=app.py
 export DATABASE_URL=sqlite:///yourdatabase.db
 
 ```console
-flask db init
+$ flask db init
 
-flask db migrate -m 'Initial migration'
+$ flask db migrate -m 'Initial migration'
 
-flask db upgrade
+$ flask db upgrade
 ```
 
 Next, in order to get the flask application working, download the python dependencies and enter the python virtual environment. From the command line, navigate from the current directory you are in into the server directory.
 
 ```console
 
-pipenv install
+$ pipenv install
 
-pipenv shell
+$ pipenv shell
 
 ```
 
